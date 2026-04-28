@@ -104,22 +104,22 @@ flutter_launcher_icons:
   android: true
   ios: true
 
-  image_path: "assets/images/app_icon.png"
+  image_path: "./assets/images/app_icon.png"
 
   web:
     generate: true
-    image_path: "assets/images/app_icon.png"
+    image_path: "./assets/images/app_icon.png"
     background_color: "#1E1E2E"
     theme_color: "#2563EB"
 
   macos:
     generate: true
-    image_path: "assets/images/app_icon.png"
+    image_path: "./assets/images/app_icon.png"
 
   windows:
     generate: true
-    image_path: "assets/images/app_icon.png"
+    image_path: "./assets/images/app_icon.png"
 
   # Android adaptive icon (REAL fix here)
   adaptive_icon_background: "#1E1E2E"
-  adaptive_icon_foreground: "assets/images/app_icon_foreground.png"
+  adaptive_icon_foreground: "./assets/images/app_icon_foreground.png"
