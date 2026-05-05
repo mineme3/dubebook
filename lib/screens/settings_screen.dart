@@ -18,8 +18,21 @@ class SettingsScreen extends StatelessWidget {
           _buildSectionHeader('DATABASE MANAGEMENT'),
           _buildSettingsTile(
             icon: Icons.cloud_upload_rounded,
-            title: 'Export Local Backup',
-            subtitle: 'Securely export your credit database file.',
+            title: Text(
+              'Export Local Backup',
+              style:TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),  
+            ),
+            subtitle: Text(
+              'Securely export your credit database file.',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 12,
+              ),
+            ),
             onTap: () async {
               try {
                 await BackupService.exportDatabase();
@@ -47,13 +60,39 @@ class SettingsScreen extends StatelessWidget {
           _buildSectionHeader('APPLICATION INFO'),
           _buildSettingsTile(
             icon: Icons.auto_awesome_rounded,
-            title: 'Dube book',
-            subtitle: 'Version 0.0.1 (Beta Release)',
+            title: Text(
+              'Dube book',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              'Version 0.0.1 (Beta Release)',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 14,
+              ),
+            ),
           ),
-          _buildSettingsTile(
+          _buildSettingsTile( 
             icon: Icons.fingerprint_rounded,
-            title: 'Security Engine',
-            subtitle: 'Local-only data architecture',
+            title: Text(
+              'Security Engine',
+              style:TextStyle(
+                color: AppTheme.textPrimary, 
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              )
+            ),
+            subtitle: Text(
+              'Local-only data architecture',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 14,
+              ),
+            ),
           ),
           const SizedBox(height: 64),
           Center(
@@ -70,7 +109,11 @@ class SettingsScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   const Text(
                     '© 2024 WECAN TEAM',
-                    style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -96,7 +139,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsTile({required IconData icon, required String title, String? subtitle, VoidCallback? onTap}) {
+  Widget _buildSettingsTile({required IconData icon, required dynamic title, dynamic subtitle, VoidCallback? onTap}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -115,8 +158,14 @@ class SettingsScreen extends StatelessWidget {
           ),
           child: Icon(icon, color: AppTheme.primaryBlue, size: 24),
         ),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-        subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w500)) : null,
+        title: title is String
+            ? Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16))
+            : title,
+        subtitle: subtitle != null
+            ? (subtitle is String
+                ? Text(subtitle, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w500))
+                : subtitle)
+            : null,
         trailing: onTap != null ? const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white24, size: 16) : null,
       ),
     );
