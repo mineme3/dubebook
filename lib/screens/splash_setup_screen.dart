@@ -88,15 +88,22 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
                 children: [
                   const SizedBox(height: 20),
                   _buildLogo(),
-                  const SizedBox(height: 56),
+                  const SizedBox(height: 40),
                   _buildInputSection(),
                   const SizedBox(height: 48),
                   _buildInitializeButton(),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Your data is stored securely on this device only.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.lock_rounded, size: 14, color: AppTheme.textSecondary.withOpacity(0.5)),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Your data is stored securely on this device only.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -110,7 +117,7 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
   Widget _buildInitializeButton() {
     return Container(
       width: double.infinity,
-      height: 64,
+      height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -134,7 +141,7 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
-            Text('INITIALIZE SYSTEM', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2)),
+            Text('Set Up My Shop', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
             SizedBox(width: 12),
             Icon(Icons.arrow_forward_rounded, size: 20),
           ],
@@ -151,9 +158,9 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
           decoration: BoxDecoration(
             color: AppTheme.primaryBlue.withOpacity(0.1),
             borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.2)),
+            border: Border.all(color: AppTheme.primaryBlue, width: 2),
           ),
-          child: const Icon(Icons.wallet_rounded, size: 64, color: AppTheme.primaryBlue),
+          child: const Icon(Icons.wallet_rounded, size: 80, color: AppTheme.primaryBlue),
         ),
         const SizedBox(height: 24),
         const Text(
@@ -163,7 +170,7 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
         const SizedBox(height: 4),
         Text(
           'PROFESSIONAL SHOP ASSISTANT',
-          style: TextStyle(fontSize: 10, color: AppTheme.textSecondary, letterSpacing: 2, fontWeight: FontWeight.w900),
+          style: TextStyle(fontSize: 13, color: AppTheme.textSecondary, letterSpacing: 1.2, fontWeight: FontWeight.w900),
         ),
       ],
     );
@@ -173,11 +180,23 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('SECURE SETUP', style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2)),
+        Row(
+          children: [
+            Container(width: 3, height: 16, color: AppTheme.primaryBlue),
+            const SizedBox(width: 8),
+            Text('SECURE SETUP', style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2)),
+          ],
+        ),
         const SizedBox(height: 16),
         _buildField(_passwordController, 'Create Master Password', Icons.lock_rounded, true),
         const SizedBox(height: 32),
-        Text('RECOVERY QUESTIONS', style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2)),
+        Row(
+          children: [
+            Container(width: 3, height: 16, color: AppTheme.primaryBlue),
+            const SizedBox(width: 8),
+            Text('RECOVERY QUESTIONS', style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2)),
+          ],
+        ),
         const SizedBox(height: 16),
         _buildField(_q1Controller, 'In which city were you born?', Icons.location_city_rounded, false),
         const SizedBox(height: 16),
@@ -194,7 +213,21 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
       style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: AppTheme.primaryBlue, size: 22),
+        prefixIcon: Icon(icon, color: AppTheme.primaryBlue, size: 20),
+        filled: true,
+        fillColor: const Color(0xFFF8FAFC),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFFD0D5E0), width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFFD0D5E0), width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 2),
+        ),
       ),
       validator: (v) => v!.isEmpty ? 'This information is required' : null,
     );
