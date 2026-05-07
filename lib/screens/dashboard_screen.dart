@@ -234,7 +234,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onTap: () async {
                   final d = await showDatePicker(
                     context: ctx,
-                    initialDate: DateTime.now().add(const Duration(days: 7)),
+                    initialDate: DateTime.now(),
                     firstDate: DateTime.now(),
                     lastDate: DateTime(2100),
                     builder: (context, child) => Theme(data: AppTheme.darkTheme, child: child!),
