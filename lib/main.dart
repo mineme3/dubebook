@@ -21,7 +21,7 @@ void main() async {
   await NotificationService().init();
   await initializeDateFormatting('en_US', null);
   
-  runApp(const SessionManager(child: DubebookApp()));
+  runApp(const SessionManager(child: DubeNoteApp()));
 }
 
 // 2. The SessionManager handles the countdown and resets on interaction
@@ -70,14 +70,14 @@ class _SessionManagerState extends State<SessionManager> {
   }
 }
 
-class DubebookApp extends StatelessWidget {
-  const DubebookApp({super.key});
+class DubeNoteApp extends StatelessWidget {
+  const DubeNoteApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: navigatorKey, // 4. Assign the key here
-      title: 'Dubebook',
+      title: 'Dube Note',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       home: const SplashSetupScreen(),

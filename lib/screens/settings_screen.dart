@@ -61,7 +61,7 @@ class SettingsScreen extends StatelessWidget {
           _buildSettingsTile(
             icon: Icons.auto_awesome_rounded,
             title: Text(
-              'Dube book',
+              'Dube Note',
               style: TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 14,
@@ -103,7 +103,7 @@ class SettingsScreen extends StatelessWidget {
                   const Icon(Icons.wallet_rounded, size: 48, color: Colors.white),
                   const SizedBox(height: 8),
                   const Text(
-                    'DUBE BOOK',
+                    'DUBE NOTE',
                     style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 4),
                   ),
                   const SizedBox(height: 4),
