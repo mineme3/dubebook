@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     child: Column(
                       children: [
                         const Text(
-                          'DUBE BOOK', 
+                          'DUBE NOTE', 
                           style: TextStyle(
                             fontSize: 32, 
                             fontWeight: FontWeight.w900, 
@@ -104,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'ENTER PASSWORD TO UNLOCK', 
+                          'ENTER PASSWORD TO ENTER', 
                           style: TextStyle(
                             color: AppTheme.textSecondary, 
                             fontSize: 10, 
@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         child: const Text(
-          'UNLOCK SYSTEM', 
+          'ENTER', 
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2)
         ),
       ),

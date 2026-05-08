@@ -45,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('DUBE BOOK'),
+        title: const Text('DUBE NOTE'),
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded, color: AppTheme.accentGreen),

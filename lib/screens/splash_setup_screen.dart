@@ -173,7 +173,7 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
         ),
         const SizedBox(height: 24),
         const Text(
-          'DUBE BOOK',
+          'DUBE NOTE',
           style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: AppTheme.textPrimary, letterSpacing: 6),
         ),
         const SizedBox(height: 4),
