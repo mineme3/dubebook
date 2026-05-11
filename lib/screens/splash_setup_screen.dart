@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
+import '../services/locale_service.dart';
 import '../utils/theme.dart';
+import '../utils/ethiopian_calendar.dart';
+import '../main.dart';
 import 'login_screen.dart';
 import 'dashboard_screen.dart';
 
@@ -13,6 +17,7 @@ class SplashSetupScreen extends StatefulWidget {
 
 class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTickerProviderStateMixin {
   bool _isLoading = true;
+  bool _showLanguageSelection = false;
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   final _q1Controller = TextEditingController();
@@ -32,8 +37,11 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
   Future<void> _checkStatus() async {
     final isFirst = await AuthService.isFirstLaunch();
     if (isFirst) {
+      // Check if language has been selected yet
+      final hasLocale = await LocaleService.hasLocale();
       setState(() {
         _isLoading = false;
+        _showLanguageSelection = !hasLocale;
       });
       _animationController.forward();
     } else {
@@ -45,14 +53,17 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
     }
   }
 
-  int get _currentEthiopianYear {
-    final now = DateTime.now();
-    // Ethiopian year is Gregorian - 8 if before Sept 11 (approx), else - 7.
-    if (now.month < 9 || (now.month == 9 && now.day < 11)) {
-      return now.year - 8;
+  Future<void> _selectLanguage(String code) async {
+    await LocaleService.setLocale(code);
+    if (mounted) {
+      DubeNoteApp.setLocale(context, Locale(code));
+      setState(() {
+        _showLanguageSelection = false;
+      });
     }
-    return now.year - 7;
   }
+
+  int get _currentEthiopianYear => EthiopianCalendar.currentYear();
 
   Future<void> _submitSetup() async {
     if (_formKey.currentState!.validate()) {
@@ -84,6 +95,12 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
       );
     }
 
+    if (_showLanguageSelection) {
+      return _buildLanguageSelection();
+    }
+
+    final l = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
@@ -96,21 +113,23 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  _buildLogo(),
+                  _buildLogo(l),
                   const SizedBox(height: 40),
-                  _buildInputSection(),
+                  _buildInputSection(l),
                   const SizedBox(height: 48),
-                  _buildInitializeButton(),
+                  _buildInitializeButton(l),
                   const SizedBox(height: 40),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.lock_rounded, size: 14, color: AppTheme.textSecondary.withOpacity(0.5)),
                       const SizedBox(width: 6),
-                      Text(
-                        'Your data is stored securely on this device only.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.bold),
+                      Flexible(
+                        child: Text(
+                          l.dataSecureNote,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   ),
@@ -123,7 +142,99 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
     );
   }
 
-  Widget _buildInitializeButton() {
+  Widget _buildLanguageSelection() {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 40.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: AppTheme.primaryBlue, width: 2),
+                  ),
+                  child: const Icon(Icons.translate_rounded, size: 64, color: AppTheme.primaryBlue),
+                ),
+                const SizedBox(height: 32),
+                const Text(
+                  'DUBE NOTE',
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppTheme.textPrimary, letterSpacing: 6),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'SELECT YOUR LANGUAGE',
+                  style: TextStyle(fontSize: 12, color: AppTheme.textSecondary, letterSpacing: 2, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'ቋንቋ ይምረጡ • AFAAN FILADHU',
+                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary.withOpacity(0.6), fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 48),
+                _buildLanguageCard('English', 'EN', Icons.language_rounded, 'en'),
+                const SizedBox(height: 16),
+                _buildLanguageCard('አማርኛ', 'AM', Icons.language_rounded, 'am'),
+                const SizedBox(height: 16),
+                _buildLanguageCard('Afan Oromo', 'OM', Icons.language_rounded, 'om'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageCard(String name, String code, IconData icon, String localeCode) {
+    return GestureDetector(
+      onTap: () => _selectLanguage(localeCode),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        decoration: BoxDecoration(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.2), width: 1.5),
+          boxShadow: [
+            BoxShadow(color: AppTheme.primaryBlue.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Center(
+                child: Text(
+                  code,
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppTheme.primaryBlue, letterSpacing: 1),
+                ),
+              ),
+            ),
+            const SizedBox(width: 18),
+            Expanded(
+              child: Text(
+                name,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppTheme.textPrimary),
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: AppTheme.primaryBlue, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInitializeButton(AppLocalizations l) {
     return Container(
       width: double.infinity,
       height: 56,
@@ -149,17 +260,17 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Set Up My Shop', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-            SizedBox(width: 12),
-            Icon(Icons.arrow_forward_rounded, size: 20),
+          children: [
+            Text(l.setUpMyShop, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            const SizedBox(width: 12),
+            const Icon(Icons.arrow_forward_rounded, size: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLogo() {
+  Widget _buildLogo(AppLocalizations l) {
     return Column(
       children: [
         Container(
@@ -172,20 +283,20 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
           child: const Icon(Icons.wallet_rounded, size: 80, color: AppTheme.primaryBlue),
         ),
         const SizedBox(height: 24),
-        const Text(
-          'DUBE NOTE',
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: AppTheme.textPrimary, letterSpacing: 6),
+        Text(
+          l.appName,
+          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: AppTheme.textPrimary, letterSpacing: 6),
         ),
         const SizedBox(height: 4),
         Text(
-          'PROFESSIONAL SHOP ASSISTANT',
+          l.appTagline,
           style: TextStyle(fontSize: 13, color: AppTheme.textSecondary, letterSpacing: 1.2, fontWeight: FontWeight.w900),
         ),
       ],
     );
   }
 
-  Widget _buildInputSection() {
+  Widget _buildInputSection(AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -193,18 +304,18 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
           children: [
             Container(width: 3, height: 16, color: AppTheme.primaryBlue),
             const SizedBox(width: 8),
-            Text('SECURE SETUP', style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2)),
+            Text(l.secureSetup, style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2)),
           ],
         ),
         const SizedBox(height: 16),
         _buildField(
           _passwordController,
-          'Master Password',
+          l.masterPassword,
           Icons.password_rounded,
           true,
           validator: (v) {
-            if (v == null || v.isEmpty) return 'Password is required';
-            if (v.length < 4) return 'Must be at least 4 characters';
+            if (v == null || v.isEmpty) return l.passwordRequired;
+            if (v.length < 4) return l.passwordMinLength;
             return null;
           },
         ),
@@ -213,55 +324,37 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
           children: [
             Container(width: 3, height: 16, color: AppTheme.primaryBlue),
             const SizedBox(width: 8),
-            Text('RECOVERY QUESTIONS', style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2)),
+            Text(l.recoveryQuestions, style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2)),
           ],
         ),
         const SizedBox(height: 16),
         _buildField(
           _q1Controller,
-          'Birth City',
+          l.birthCity,
           Icons.location_on_rounded,
           false,
-          validator: (v) => v!.isEmpty ? 'Birth city is required' : null,
+          validator: (v) => v!.isEmpty ? l.birthCityRequired : null,
         ),
         const SizedBox(height: 16),
         _buildField(
           _q2Controller,
-          'Opening Year (Ethiopian)',
+          l.openingYear,
           Icons.event_available_rounded,
           false,
           isNumber: true,
           validator: (v) {
-            if (v == null || v.isEmpty) return 'Year is required';
-            if (v.length != 4) return 'Must be exactly 4 digits';
+            if (v == null || v.isEmpty) return l.yearRequired;
+            if (v.length != 4) return l.yearExactDigits;
             
             final year = int.tryParse(v);
-            if (year == null) return 'Invalid year format';
+            if (year == null) return l.invalidYearFormat;
             
             final currentYear = _currentEthiopianYear;
-            if (year > currentYear) return 'Cannot be in the future ($currentYear E.C.)';
-            if (year < currentYear - 50) return 'Too far in the past (Min: ${currentYear - 50})';
+            if (year > currentYear) return l.yearFuture(currentYear);
+            if (year < currentYear - 50) return l.yearTooOld(currentYear - 50);
             
             return null;
           },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Row(
-      children: [
-        Container(width: 4, height: 16, decoration: BoxDecoration(color: AppTheme.primaryBlue, borderRadius: BorderRadius.circular(2))),
-        const SizedBox(width: 10),
-        Text(
-          title,
-          style: TextStyle(
-            color: AppTheme.textPrimary.withOpacity(0.8),
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
         ),
       ],
     );
@@ -311,4 +404,3 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
     super.dispose();
   }
 }
-

@@ -12,7 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 test.dart
-
+changenote.md
 # IntelliJ related
 *.iml
 *.ipr

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../utils/theme.dart';
 import 'dashboard_screen.dart';
@@ -50,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Container(
@@ -93,9 +95,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     opacity: _fadeAnimation,
                     child: Column(
                       children: [
-                        const Text(
-                          'DUBE NOTE', 
-                          style: TextStyle(
+                        Text(
+                          l.appName, 
+                          style: const TextStyle(
                             fontSize: 32, 
                             fontWeight: FontWeight.w900, 
                             letterSpacing: 8,
@@ -104,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'ENTER PASSWORD TO ENTER', 
+                          l.enterPasswordPrompt, 
                           style: TextStyle(
                             color: AppTheme.textSecondary, 
                             fontSize: 10, 
@@ -119,9 +121,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontSize: 24, letterSpacing: 12, color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
                           decoration: InputDecoration(
-                            hintText: '••••••',
+                            hintText: l.passwordHint,
                             hintStyle: TextStyle(color: AppTheme.textSecondary.withOpacity(0.2)),
-                            errorText: _error ? 'Access Denied' : null,
+                            errorText: _error ? l.accessDenied : null,
                             contentPadding: const EdgeInsets.symmetric(vertical: 20),
                           ),
                           onSubmitted: (_) => _login(),
@@ -132,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         TextButton(
                           onPressed: () => showDialog(context: context, builder: (_) => const ForgotPasswordDialog()),
                           child: Text(
-                            'FORGOT PASSWORD?', 
+                            l.forgotPassword, 
                             style: TextStyle(
                               color: AppTheme.textSecondary.withOpacity(0.5), 
                               fontSize: 11, 
@@ -154,6 +156,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   Widget _buildUnlockButton() {
+    final l = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       height: 64,
@@ -177,9 +180,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
-        child: const Text(
-          'ENTER', 
-          style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2)
+        child: Text(
+          l.enter, 
+          style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2)
         ),
       ),
     );
@@ -208,31 +211,32 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return AlertDialog(
       backgroundColor: AppTheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28), side: BorderSide(color: Colors.white.withOpacity(0.1))),
-      title: const Text('RECOVERY', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+      title: Text(l.recovery, style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (_err) 
-              const Padding(
-                padding: EdgeInsets.only(bottom: 16),
-                child: Text('SECURITY ANSWERS INCORRECT', style: TextStyle(color: AppTheme.error, fontSize: 11, fontWeight: FontWeight.bold)),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(l.securityAnswersIncorrect, style: const TextStyle(color: AppTheme.error, fontSize: 11, fontWeight: FontWeight.bold)),
               ),
-            _field(_q1, 'Place of Birth', Icons.location_on_rounded),
+            _field(_q1, l.placeOfBirth, Icons.location_on_rounded),
             const SizedBox(height: 16),
-            _field(_q2, 'Year Shop Opened', Icons.calendar_today_rounded),
+            _field(_q2, l.yearShopOpened, Icons.calendar_today_rounded),
             const SizedBox(height: 16),
-            _field(_pass, 'Create New Password', Icons.vpn_key_rounded, obscure: true),
+            _field(_pass, l.createNewPassword, Icons.vpn_key_rounded, obscure: true),
           ],
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context), 
-          child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary))
+          child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary))
         ),
         ElevatedButton(
           onPressed: () async {
@@ -240,8 +244,8 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
             if (ok && mounted) {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Password reset successfully'), 
+                SnackBar(
+                  content: Text(l.passwordResetSuccess), 
                   backgroundColor: AppTheme.primaryBlue,
                   behavior: SnackBarBehavior.floating,
                 )
@@ -250,7 +254,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
               setState(() => _err = true);
             }
           },
-          child: const Text('RESET'),
+          child: Text(l.reset),
         ),
       ],
     );

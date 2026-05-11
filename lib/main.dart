@@ -3,9 +3,13 @@ import 'dart:async'; // Required for Timer
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'utils/fallback_localization_delegates.dart';
+import 'l10n/app_localizations.dart';
 import 'utils/theme.dart';
 import 'screens/splash_setup_screen.dart';
 import 'services/notification_service.dart';
+import 'services/locale_service.dart';
 
 // 1. Define a GlobalKey to handle logout navigation without context
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -21,7 +25,10 @@ void main() async {
   await NotificationService().init();
   await initializeDateFormatting('en_US', null);
   
-  runApp(const SessionManager(child: DubeNoteApp()));
+  // Load saved locale
+  final savedLocale = await LocaleService.getSavedLocale();
+  
+  runApp(SessionManager(child: DubeNoteApp(initialLocale: savedLocale)));
 }
 
 // 2. The SessionManager handles the countdown and resets on interaction
@@ -70,8 +77,34 @@ class _SessionManagerState extends State<SessionManager> {
   }
 }
 
-class DubeNoteApp extends StatelessWidget {
-  const DubeNoteApp({super.key});
+class DubeNoteApp extends StatefulWidget {
+  final Locale? initialLocale;
+  const DubeNoteApp({super.key, this.initialLocale});
+
+  // Static method to change locale from anywhere in the app
+  static void setLocale(BuildContext context, Locale locale) {
+    final state = context.findAncestorStateOfType<_DubeNoteAppState>();
+    state?.setLocale(locale);
+  }
+
+  @override
+  State<DubeNoteApp> createState() => _DubeNoteAppState();
+}
+
+class _DubeNoteAppState extends State<DubeNoteApp> {
+  Locale? _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    _locale = widget.initialLocale;
+  }
+
+  void setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +113,18 @@ class DubeNoteApp extends StatelessWidget {
       title: 'Dube Note',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      locale: _locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        FallbackMaterialLocalizationsDelegate(),
+        GlobalWidgetsLocalizations.delegate,
+        FallbackCupertinoLocalizationsDelegate(),
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('am'),
+        Locale('om'),
+      ],
       home: const SplashSetupScreen(),
     );
   }
