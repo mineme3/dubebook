@@ -46,6 +46,20 @@ The application handles the complete credit lifecycle — from registering custo
 
 ---
 
+## 📱 UI Showcase
+
+### Authentication and Onboarding
+
+![Authentication and onboarding screen](public/mockups/screen.png)
+
+This screen represents the first-use flow, where the app sets up secure local access before the user enters the main credit management experience.
+
+### Customer Management Flow
+
+The same interface supports the day-to-day workflow for reviewing balances, opening customer records, and moving from active credit to paid history.
+
+---
+
 ## Architecture
 
 Dube Note follows a clean, layered architecture designed for maintainability and simplicity without over-engineering.
