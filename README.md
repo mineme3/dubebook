@@ -165,7 +165,7 @@ flutter run --device-id <ios-device-or-simulator>
 
 ---
 
-## Data Model
+## Model
 
 ```
 ┌──────────┐       ┌──────────────┐       ┌──────────────┐
