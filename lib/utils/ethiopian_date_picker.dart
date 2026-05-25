@@ -33,6 +33,12 @@ Future<DateTime?> showEthiopianDatePicker({
             selectedDay = daysInMonth;
           }
 
+          final selectedEthDate = EthiopianCalendar(selectedYear, selectedMonth, selectedDay);
+          final selectedGregorian = selectedEthDate.toGregorian();
+          final today = DateTime.now();
+          final todayStart = DateTime(today.year, today.month, today.day);
+          final isPast = selectedGregorian.isBefore(todayStart);
+
           List<String> monthNames;
           switch (locale) {
             case 'am':
@@ -136,6 +142,22 @@ Future<DateTime?> showEthiopianDatePicker({
                     });
                   },
                 ),
+                if (isPast) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    locale == 'am'
+                        ? 'የቀነ-ገደብ ቀን ካለፈው ቀን መሆን አይችልም'
+                        : locale == 'om'
+                            ? 'Guyyaan beellamaa darbe ta\'uu hin danda\'u'
+                            : 'Due date cannot be in the past',
+                    style: const TextStyle(
+                      color: AppTheme.error,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ],
             ),
             actions: [
@@ -147,7 +169,7 @@ Future<DateTime?> showEthiopianDatePicker({
                 ),
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: isPast ? null : () {
                   final ethDate = EthiopianCalendar(selectedYear, selectedMonth, selectedDay);
                   Navigator.pop(ctx, ethDate.toGregorian());
                 },

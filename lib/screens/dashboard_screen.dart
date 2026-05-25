@@ -21,6 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Map<String, dynamic>> _unpaidCustomers = [];
   bool _isLoading = true;
   double _totalUnpaid = 0.0;
+  final Set<int> _selectedCustomerIds = {};
 
   @override
   void initState() {
@@ -39,13 +40,187 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _unpaidCustomers = data;
       _totalUnpaid = total;
       _isLoading = false;
+      _selectedCustomerIds.clear();
     });
+  }
+
+  void _toggleSelection(int customerId) {
+    setState(() {
+      if (_selectedCustomerIds.contains(customerId)) {
+        _selectedCustomerIds.remove(customerId);
+      } else {
+        _selectedCustomerIds.add(customerId);
+      }
+    });
+  }
+
+  Future<void> _markSelectedAsPaid() async {
+    final l = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(l.settleDebt, style: const TextStyle(fontWeight: FontWeight.w900)),
+        content: Text(
+          locale == 'am' 
+              ? 'የተመረጡትን ደንበኞች ዕዳዎች በሙሉ ተከፍለዋል ለማለት ይፈልጋሉ?' 
+              : locale == 'om' 
+                  ? 'Liqii maamiloota filatamanii hunda akka kaffalameetti mallattoo gochuu barbaaddaa?' 
+                  : 'Are you sure you want to mark all selected customers\' debts as paid?',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary))),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l.confirm))
+        ]
+      )
+    );
+    if (ok == true) {
+      setState(() => _isLoading = true);
+      for (var id in _selectedCustomerIds) {
+        await DatabaseHelper.instance.markAllCustomerTransactionsAsPaid(id);
+        await NotificationService().cancelNotification(id);
+      }
+      _loadData();
+    }
+  }
+
+  Future<void> _deleteSelectedCustomers() async {
+    final l = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(l.deleteCustomer, style: const TextStyle(color: AppTheme.error, fontWeight: FontWeight.w900)),
+        content: Text(
+          locale == 'am' 
+              ? 'የተመረጡትን ደንበኞች እና የግብይት መረጃዎቻቸውን እስከመጨረሻው ለመሰረዝ እርግጠኛ ነዎት? ይህ ሊቀለበስ አይችልም።' 
+              : locale == 'om' 
+                  ? 'Maamiloota filataman fi galmeewwan daldalaa isaanii hunda dhaabbataan haquuf mirkaneessaa? Kun deebi\'uu hin danda\'u.' 
+                  : 'Are you sure you want to permanently delete the selected customers and all of their transaction records? This cannot be undone.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l.delete),
+          )
+        ]
+      )
+    );
+    if (ok == true) {
+      setState(() => _isLoading = true);
+      for (var id in _selectedCustomerIds) {
+        await DatabaseHelper.instance.deleteCustomer(id);
+        await NotificationService().cancelNotification(id);
+      }
+      _loadData();
+    }
+  }
+
+  Future<void> _markAsPaidSingle(Customer customer) async {
+    final l = AppLocalizations.of(context)!;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(l.settleDebt, style: const TextStyle(fontWeight: FontWeight.w900)),
+        content: Text(l.markAllAsPaidConfirm),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary))),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l.confirm))
+        ]
+      )
+    );
+    if (ok == true) {
+      setState(() => _isLoading = true);
+      await DatabaseHelper.instance.markAllCustomerTransactionsAsPaid(customer.id!);
+      await NotificationService().cancelNotification(customer.id!);
+      _loadData();
+    }
+  }
+
+  Future<void> _deleteSingleCustomer(Customer customer) async {
+    final l = AppLocalizations.of(context)!;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(l.deleteCustomer, style: const TextStyle(color: AppTheme.error, fontWeight: FontWeight.w900)),
+        content: Text(l.deleteCustomerConfirm),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l.delete),
+          )
+        ]
+      )
+    );
+    if (ok == true) {
+      setState(() => _isLoading = true);
+      await DatabaseHelper.instance.deleteCustomer(customer.id!);
+      await NotificationService().cancelNotification(customer.id!);
+      _loadData();
+    }
+  }
+
+  void _showQuickActionsBottomSheet(Customer customer, double debt) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        final l = AppLocalizations.of(context)!;
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                child: Text(
+                  customer.name,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.textPrimary),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.check_circle_rounded, color: AppTheme.accentGreen),
+                title: Text(l.settleDebt, style: const TextStyle(fontWeight: FontWeight.bold)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _markAsPaidSingle(customer);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete_rounded, color: AppTheme.error),
+                title: Text(l.deleteCustomer, style: const TextStyle(color: AppTheme.error, fontWeight: FontWeight.bold)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteSingleCustomer(customer);
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isSelectionMode = _selectedCustomerIds.isNotEmpty;
 
     Widget body;
     if (isLandscape) {
@@ -98,15 +273,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             final customer = Customer.fromMap(item);
                             final debt = (item['total_debt'] as num).toDouble();
                             final isOverdue = customer.deadline != null && customer.deadline!.isBefore(DateTime.now());
+                            final isSelected = _selectedCustomerIds.contains(customer.id);
 
                             return _AnimatedCustomerTile(
                               index: index,
                               customer: customer,
                               debt: debt,
                               isOverdue: isOverdue,
+                              isSelected: isSelected,
                               onTap: () async {
-                                await Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerDetailScreen(customer: customer)));
-                                _loadData();
+                                if (isSelectionMode) {
+                                  _toggleSelection(customer.id!);
+                                } else {
+                                  await Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerDetailScreen(customer: customer)));
+                                  _loadData();
+                                }
+                              },
+                              onLongPress: () {
+                                if (isSelectionMode) {
+                                  _toggleSelection(customer.id!);
+                                } else {
+                                  _showQuickActionsBottomSheet(customer, debt);
+                                }
                               },
                             );
                           },
@@ -155,15 +343,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       final customer = Customer.fromMap(item);
                       final debt = (item['total_debt'] as num).toDouble();
                       final isOverdue = customer.deadline != null && customer.deadline!.isBefore(DateTime.now());
+                      final isSelected = _selectedCustomerIds.contains(customer.id);
 
                       return _AnimatedCustomerTile(
                         index: index,
                         customer: customer,
                         debt: debt,
                         isOverdue: isOverdue,
+                        isSelected: isSelected,
                         onTap: () async {
-                          await Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerDetailScreen(customer: customer)));
-                          _loadData();
+                          if (isSelectionMode) {
+                            _toggleSelection(customer.id!);
+                          } else {
+                            await Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerDetailScreen(customer: customer)));
+                            _loadData();
+                          }
+                        },
+                        onLongPress: () {
+                          if (isSelectionMode) {
+                            _toggleSelection(customer.id!);
+                          } else {
+                            _showQuickActionsBottomSheet(customer, debt);
+                          }
                         },
                       );
                     },
@@ -175,30 +376,60 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        title: Text(l.appName),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history_rounded, color: AppTheme.accentGreen),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_rounded, color: AppTheme.textSecondary),
-            onPressed: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
-              // Reload in case language changed
-              if (mounted) setState(() {});
-            },
-          ),
-        ],
-      ),
+      appBar: isSelectionMode
+          ? AppBar(
+              backgroundColor: AppTheme.primaryBlue,
+              elevation: 0,
+              centerTitle: false,
+              leading: IconButton(
+                icon: const Icon(Icons.close_rounded, color: Colors.white),
+                onPressed: () {
+                  setState(() {
+                    _selectedCustomerIds.clear();
+                  });
+                },
+              ),
+              title: Text(
+                '${_selectedCustomerIds.length}',
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.check_circle_rounded, color: Colors.white),
+                  onPressed: _markSelectedAsPaid,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_rounded, color: Colors.white),
+                  onPressed: _deleteSelectedCustomers,
+                ),
+              ],
+            )
+          : AppBar(
+              title: Text(l.appName),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.history_rounded, color: AppTheme.accentGreen),
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen())),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.settings_rounded, color: AppTheme.textSecondary),
+                  onPressed: () async {
+                    await Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+                    // Reload in case language changed
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ],
+            ),
       body: body,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddCustomerDialog,
-        backgroundColor: AppTheme.primaryBlue,
-        label: Text(l.newCustomer, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-        icon: const Icon(Icons.person_add_rounded, color: Colors.white),
-      ),
+      floatingActionButton: isSelectionMode
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _showAddCustomerDialog,
+              backgroundColor: AppTheme.primaryBlue,
+              label: Text(l.newCustomer, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+              icon: const Icon(Icons.person_add_rounded, color: Colors.white),
+            ),
     );
   }
 
@@ -391,9 +622,19 @@ class _AnimatedCustomerTile extends StatelessWidget {
   final Customer customer;
   final double debt;
   final bool isOverdue;
+  final bool isSelected;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
-  const _AnimatedCustomerTile({required this.index, required this.customer, required this.debt, required this.isOverdue, required this.onTap});
+  const _AnimatedCustomerTile({
+    required this.index,
+    required this.customer,
+    required this.debt,
+    required this.isOverdue,
+    required this.isSelected,
+    required this.onTap,
+    required this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -412,15 +653,18 @@ class _AnimatedCustomerTile extends StatelessWidget {
       },
       child: GestureDetector(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Container(
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: isSelected ? AppTheme.primaryBlue.withOpacity(0.05) : AppTheme.surface,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: isOverdue ? AppTheme.error.withOpacity(0.4) : AppTheme.textSecondary.withOpacity(0.1),
-              width: isOverdue ? 1.5 : 1,
+              color: isSelected 
+                  ? AppTheme.primaryBlue 
+                  : (isOverdue ? AppTheme.error.withOpacity(0.4) : AppTheme.textSecondary.withOpacity(0.1)),
+              width: isSelected ? 2.0 : (isOverdue ? 1.5 : 1),
             ),
           ),
           child: Row(
@@ -430,23 +674,27 @@ class _AnimatedCustomerTile extends StatelessWidget {
                 height: 54,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: isOverdue
-                      ? [AppTheme.error.withOpacity(0.2), AppTheme.error.withOpacity(0.05)]
-                      : [AppTheme.primaryBlue.withOpacity(0.1), AppTheme.primaryBlue.withOpacity(0.02)],
+                    colors: isSelected
+                      ? [AppTheme.primaryBlue, AppTheme.primaryBlue.withOpacity(0.8)]
+                      : isOverdue
+                        ? [AppTheme.error.withOpacity(0.2), AppTheme.error.withOpacity(0.05)]
+                        : [AppTheme.primaryBlue.withOpacity(0.1), AppTheme.primaryBlue.withOpacity(0.02)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Center(
-                  child: Text(
-                    customer.name[0].toUpperCase(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 22,
-                      color: isOverdue ? AppTheme.error : AppTheme.primaryBlue,
-                    ),
-                  ),
+                  child: isSelected
+                    ? const Icon(Icons.check_rounded, color: Colors.white, size: 24)
+                    : Text(
+                        customer.name[0].toUpperCase(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 22,
+                          color: isOverdue ? AppTheme.error : AppTheme.primaryBlue,
+                        ),
+                      ),
                 ),
               ),
               const SizedBox(width: 18),
