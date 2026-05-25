@@ -7,7 +7,7 @@ import '../models/user.dart';
 
 class DatabaseHelper {
   static const _databaseName = "Dubebook.db";
-  static const _databaseVersion = 2;
+  static const _databaseVersion = 3; // Incremented for new role tables
 
   static const tableUser = 'users';
   static const tableCustomer = 'customers';
@@ -39,9 +39,13 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE $tableUser (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        full_name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        phone TEXT NOT NULL,
         password_hash TEXT NOT NULL,
-        security_q1_answer TEXT NOT NULL,
-        security_q2_answer TEXT NOT NULL
+        role TEXT NOT NULL,
+        security_question TEXT NOT NULL,
+        security_answer TEXT NOT NULL
       )
     ''');
 
@@ -49,9 +53,13 @@ class DatabaseHelper {
       CREATE TABLE $tableCustomer (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
+        email TEXT,
+        phone TEXT,
         note TEXT,
         deadline TEXT,
-        created_at TEXT NOT NULL
+        created_at TEXT NOT NULL,
+        shopkeeper_id INTEGER,
+        remote_id TEXT
       )
     ''');
 
@@ -65,20 +73,42 @@ class DatabaseHelper {
         total REAL NOT NULL,
         status INTEGER NOT NULL DEFAULT 0,
         date TEXT NOT NULL,
+        transaction_type TEXT NOT NULL DEFAULT 'debt',
+        remote_id TEXT,
+        customer_remote_id TEXT,
         FOREIGN KEY (customer_id) REFERENCES $tableCustomer (id) ON DELETE CASCADE
       )
     ''');
   }
 
-  // User Operations
-  Future<int> insertUser(User user) async {
-    Database db = await instance.database;
-    return await db.insert(tableUser, user.toMap());
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 3) {
+      // Re-create to match full fintech-level fields
+      await db.execute('DROP TABLE IF EXISTS $tableTransaction');
+      await db.execute('DROP TABLE IF EXISTS $tableCustomer');
+      await db.execute('DROP TABLE IF EXISTS $tableUser');
+      await _onCreate(db, newVersion);
+    }
   }
 
-  Future<User?> getUser() async {
+  // --- USER OPERATIONS ---
+  Future<int> insertUser(User user) async {
     Database db = await instance.database;
-    final List<Map<String, dynamic>> maps = await db.query(tableUser, limit: 1);
+    return await db.insert(tableUser, user.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<User?> getUserById(int id) async {
+    Database db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(tableUser, where: 'id = ?', whereArgs: [id]);
+    if (maps.isNotEmpty) {
+      return User.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  Future<User?> getUserByEmail(String email) async {
+    Database db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(tableUser, where: 'email = ?', whereArgs: [email.toLowerCase().trim()]);
     if (maps.isNotEmpty) {
       return User.fromMap(maps.first);
     }
@@ -90,15 +120,17 @@ class DatabaseHelper {
     return await db.update(tableUser, {'password_hash': newHash}, where: 'id = ?', whereArgs: [id]);
   }
 
-  // Customer Operations
+  // --- CUSTOMER OPERATIONS ---
   Future<int> insertCustomer(Customer customer) async {
     Database db = await instance.database;
     return await db.insert(tableCustomer, customer.toMap());
   }
 
-  Future<List<Customer>> getCustomers() async {
+  Future<List<Customer>> getCustomers({int? shopkeeperId}) async {
     Database db = await instance.database;
-    final List<Map<String, dynamic>> maps = await db.query(tableCustomer);
+    final List<Map<String, dynamic>> maps = shopkeeperId != null
+        ? await db.query(tableCustomer, where: 'shopkeeper_id = ?', whereArgs: [shopkeeperId])
+        : await db.query(tableCustomer);
     return maps.map((c) => Customer.fromMap(c)).toList();
   }
   
@@ -112,18 +144,26 @@ class DatabaseHelper {
     return await db.delete(tableCustomer, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<List<Map<String, dynamic>>> getUnpaidCustomersWithDebt() async {
+  Future<List<Map<String, dynamic>>> getUnpaidCustomersWithDebt({int? shopkeeperId}) async {
     Database db = await instance.database;
+    String whereClause = '';
+    List<dynamic> whereArgs = [];
+    if (shopkeeperId != null) {
+      whereClause = 'WHERE c.shopkeeper_id = ?';
+      whereArgs.add(shopkeeperId);
+    }
+
     return await db.rawQuery('''
       SELECT c.*, COALESCE(SUM(t.total), 0) as total_debt 
       FROM $tableCustomer c
-      LEFT JOIN $tableTransaction t ON c.id = t.customer_id AND t.status = 0
+      LEFT JOIN $tableTransaction t ON c.id = t.customer_id AND t.status = 0 AND t.transaction_type = 'debt'
+      $whereClause
       GROUP BY c.id
       ORDER BY total_debt DESC, c.name ASC
-    ''');
+    ''', whereArgs);
   }
 
-  // Transaction Operations
+  // --- TRANSACTION OPERATIONS ---
   Future<int> insertTransaction(AppTransaction transaction) async {
     Database db = await instance.database;
     return await db.insert(tableTransaction, transaction.toMap());
@@ -148,17 +188,29 @@ class DatabaseHelper {
     return maps.map((t) => AppTransaction.fromMap(t)).toList();
   }
   
-  Future<List<AppTransaction>> getAllTransactions({int? status}) async {
+  Future<List<AppTransaction>> getAllTransactions({int? status, int? shopkeeperId}) async {
     Database db = await instance.database;
-    String? where = status != null ? 'status = ?' : null;
-    List<dynamic>? whereArgs = status != null ? [status] : null;
-
-    final List<Map<String, dynamic>> maps = await db.query(
-      tableTransaction,
-      where: where,
-      whereArgs: whereArgs,
-      orderBy: 'date DESC',
-    );
+    String query = '''
+      SELECT t.* FROM $tableTransaction t
+      INNER JOIN $tableCustomer c ON t.customer_id = c.id
+    ''';
+    List<dynamic> args = [];
+    
+    if (shopkeeperId != null) {
+      query += ' WHERE c.shopkeeper_id = ?';
+      args.add(shopkeeperId);
+      if (status != null) {
+        query += ' AND t.status = ?';
+        args.add(status);
+      }
+    } else if (status != null) {
+      query += ' WHERE t.status = ?';
+      args.add(status);
+    }
+    
+    query += ' ORDER BY t.date DESC';
+    
+    final List<Map<String, dynamic>> maps = await db.rawQuery(query, args);
     return maps.map((t) => AppTransaction.fromMap(t)).toList();
   }
 
@@ -195,10 +247,5 @@ class DatabaseHelper {
   Future<int> deleteTransaction(int id) async {
     Database db = await instance.database;
     return await db.delete(tableTransaction, where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // No schema changes needed for v2 — existing columns support all new features.
-    // This handler is here for safe migration if future versions require changes.
   }
 }

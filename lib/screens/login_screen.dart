@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.dart';
-import '../services/auth_service.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../services/auth_provider.dart';
 import '../utils/theme.dart';
 import 'dashboard_screen.dart';
+import 'register_screen.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,263 +14,205 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _error = false;
-  late AnimationController _animController;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
 
   @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
-    _scaleAnimation = CurvedAnimation(
-      parent: _animController, 
-      curve: const Interval(0.0, 0.8, curve: Curves.elasticOut)
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _animController, 
-      curve: const Interval(0.4, 1.0, curve: Curves.easeIn)
-    );
-    _animController.forward();
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
-  Future<void> _login() async {
-    final success = await AuthService.login(_passwordController.text);
-    if (success && mounted) {
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 600),
-          pageBuilder: (_, __, ___) => const DashboardScreen(),
-          transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
-        ),
-      );
-    } else {
-      setState(() => _error = true);
-      _passwordController.clear();
+  void _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final success = await auth.login(
+      _emailController.text,
+      _passwordController.text,
+    );
+
+    if (mounted) {
+      if (success) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 600),
+            pageBuilder: (_, __, ___) => const DashboardScreen(),
+            transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
+          ),
+        );
+      } else {
+        setState(() => _error = true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Access Denied. Incorrect email or password."),
+            backgroundColor: AppTheme.error,
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
+    final auth = Provider.of<AuthProvider>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppTheme.background,
       body: Container(
+        height: double.infinity,
         decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.topRight,
-            radius: 1.5,
-            colors: [
-              AppTheme.primaryBlue.withOpacity(0.1),
-              AppTheme.background,
-            ],
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [AppTheme.darkBg, AppTheme.darkSurface]
+                : [AppTheme.lightBg, AppTheme.lightSurface],
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Container(
-                      padding: const EdgeInsets.all(28),
+              padding: const EdgeInsets.symmetric(horizontal: 28.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Animated Logo
+                    Container(
+                      padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         color: AppTheme.primaryBlue.withOpacity(0.1),
                         shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primaryBlue.withOpacity(0.2),
-                            blurRadius: 30,
-                            spreadRadius: 2,
-                          )
-                        ],
                       ),
-                      child: const Icon(Icons.lock_outline_rounded, size: 56, color: AppTheme.primaryBlue),
+                      child: const Icon(
+                        Icons.wallet_rounded,
+                        size: 64,
+                        color: AppTheme.primaryBlue,
+                      ),
+                    ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
+
+                    const SizedBox(height: 24),
+                    const Text(
+                      "DUBE BOOK",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 6,
+                      ),
+                    ).animate().fade(duration: 400.ms).slideY(begin: 0.2, end: 0),
+                    
+                    const SizedBox(height: 8),
+                    Text(
+                      "Digital Credit & Debt Management",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                        letterSpacing: 1.2,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 40),
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: Column(
+
+                    const SizedBox(height: 48),
+
+                    // Inputs Section
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: "Email Address",
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                      validator: (v) => v!.isEmpty ? "Enter your email address" : null,
+                    ).animate().fade(delay: 100.ms),
+
+                    const SizedBox(height: 16),
+
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: "Password",
+                        prefixIcon: Icon(Icons.lock_outline_rounded),
+                      ),
+                      validator: (v) => v!.isEmpty ? "Enter password" : null,
+                    ).animate().fade(delay: 200.ms),
+
+                    const SizedBox(height: 16),
+
+                    // Forgot Password link
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                          );
+                        },
+                        child: const Text(
+                          "Forgot Password?",
+                          style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Unlock Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: auth.isLoading ? null : _login,
+                        child: auth.isLoading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text("Sign In"),
+                      ),
+                    ).animate().fade(delay: 300.ms),
+
+                    const SizedBox(height: 24),
+
+                    // Navigation to Register Screen
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          l.appName, 
-                          style: const TextStyle(
-                            fontSize: 32, 
-                            fontWeight: FontWeight.w900, 
-                            letterSpacing: 8,
-                            color: AppTheme.textPrimary,
-                          )
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          l.enterPasswordPrompt, 
+                          "Don't have an account? ",
                           style: TextStyle(
-                            color: AppTheme.textSecondary, 
-                            fontSize: 10, 
-                            fontWeight: FontWeight.w900, 
-                            letterSpacing: 2
-                          )
-                        ),
-                        const SizedBox(height: 56),
-                        TextField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 24, letterSpacing: 12, color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
-                          decoration: InputDecoration(
-                            hintText: l.passwordHint,
-                            hintStyle: TextStyle(color: AppTheme.textSecondary.withOpacity(0.2)),
-                            errorText: _error ? l.accessDenied : null,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 20),
+                            color: isDark ? AppTheme.darkTextSecondary : AppTheme.lightTextSecondary,
+                            fontWeight: FontWeight.w500,
                           ),
-                          onSubmitted: (_) => _login(),
                         ),
-                        const SizedBox(height: 40),
-                        _buildUnlockButton(),
-                        const SizedBox(height: 24),
-                        TextButton(
-                          onPressed: () => showDialog(context: context, builder: (_) => const ForgotPasswordDialog()),
-                          child: Text(
-                            l.forgotPassword, 
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                            );
+                          },
+                          child: const Text(
+                            "Register here",
                             style: TextStyle(
-                              color: AppTheme.textSecondary.withOpacity(0.5), 
-                              fontSize: 11, 
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.2
-                            )
+                              color: AppTheme.primaryBlue,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildUnlockButton() {
-    final l = AppLocalizations.of(context)!;
-    return Container(
-      width: double.infinity,
-      height: 64,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [AppTheme.primaryBlue, AppTheme.primaryBlue.withBlue(255)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primaryBlue.withOpacity(0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          )
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: _login,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        ),
-        child: Text(
-          l.enter, 
-          style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 2)
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-}
-
-class ForgotPasswordDialog extends StatefulWidget {
-  const ForgotPasswordDialog({super.key});
-
-  @override
-  State<ForgotPasswordDialog> createState() => _ForgotPasswordDialogState();
-}
-
-class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
-  final _q1 = TextEditingController();
-  final _q2 = TextEditingController();
-  final _pass = TextEditingController();
-  bool _err = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
-    return AlertDialog(
-      backgroundColor: AppTheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: BorderSide(color: Colors.white.withOpacity(0.1))),
-      title: Text(l.recovery, style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5)),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_err) 
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(l.securityAnswersIncorrect, style: const TextStyle(color: AppTheme.error, fontSize: 11, fontWeight: FontWeight.bold)),
-              ),
-            _field(_q1, l.placeOfBirth, Icons.location_on_rounded),
-            const SizedBox(height: 16),
-            _field(_q2, l.yearShopOpened, Icons.calendar_today_rounded),
-            const SizedBox(height: 16),
-            _field(_pass, l.createNewPassword, Icons.vpn_key_rounded, obscure: true),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context), 
-          child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary))
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            final ok = await AuthService.resetPassword(_q1.text, _q2.text, _pass.text);
-            if (ok && mounted) {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l.passwordResetSuccess), 
-                  backgroundColor: AppTheme.primaryBlue,
-                  behavior: SnackBarBehavior.floating,
-                )
-              );
-            } else {
-              setState(() => _err = true);
-            }
-          },
-          child: Text(l.reset),
-        ),
-      ],
-    );
-  }
-
-  Widget _field(TextEditingController c, String l, IconData i, {bool obscure = false}) {
-    return TextField(
-      controller: c,
-      obscureText: obscure,
-      style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
-      decoration: InputDecoration(
-        labelText: l,
-        prefixIcon: Icon(i, size: 20, color: AppTheme.primaryBlue),
       ),
     );
   }
