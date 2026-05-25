@@ -26,10 +26,10 @@
 
 ### 2.1 Qualitative Methods
 - **User Interviews**: 
-  - Interview 5-10 shop owners currently using paper ledgers. 
+  - Interview 1-5 shop owners currently using paper ledgers. 
   - Focus on frustrations with debt calculation and language barriers.
 - **Usability Testing**:
-  - Task 1: "Add a customer named Abebe with a deadline of next week (in Ethiopian Calendar)."
+  - Task 1: "Add a customer named Abebe with a deadline of next week (in Ethiopian Calendar) optionally."
   - Task 2: "Log a payment of 500 Birr from Abebe."
   - Task 3: "Change the app language to Amharic."
 - **Diary Studies**: Ask a shop owner to use DubeBook parallel to their paper ledger for one week and report discrepancies or speed issues.
