@@ -65,6 +65,12 @@ Future<Response> onRequest(RequestContext context) async {
           'email': owner['email'],
           'telegramChatId': owner['telegramChatId'],
           'shopName': owner['shopName'],
+          'createdAt': owner['createdAt'] is DateTime
+              ? (owner['createdAt'] as DateTime).toIso8601String()
+              : (owner['createdAt'] as String? ?? DateTime.now().toUtc().toIso8601String()),
+          'updatedAt': owner['updatedAt'] is DateTime
+              ? (owner['updatedAt'] as DateTime).toIso8601String()
+              : (owner['updatedAt'] as String? ?? DateTime.now().toUtc().toIso8601String()),
         }
       },
     );
