@@ -290,11 +290,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 }
                               },
                               onLongPress: () {
-                                if (isSelectionMode) {
-                                  _toggleSelection(customer.id!);
-                                } else {
-                                  _showQuickActionsBottomSheet(customer, debt);
-                                }
+                                _toggleSelection(customer.id!);
                               },
                             );
                           },
@@ -360,11 +356,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           }
                         },
                         onLongPress: () {
-                          if (isSelectionMode) {
-                            _toggleSelection(customer.id!);
-                          } else {
-                            _showQuickActionsBottomSheet(customer, debt);
-                          }
+                          _toggleSelection(customer.id!);
                         },
                       );
                     },
