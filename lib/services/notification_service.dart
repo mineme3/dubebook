@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -21,11 +23,19 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
     const LinuxInitializationSettings initializationSettingsLinux =
         LinuxInitializationSettings(defaultActionName: 'Open notification');
 
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
       linux: initializationSettingsLinux,
     );
 
@@ -37,6 +47,18 @@ class NotificationService {
           flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
       await androidImplementation?.requestNotificationsPermission();
+    }
+
+    // Request permissions for iOS
+    if (Platform.isIOS) {
+      final IOSFlutterLocalNotificationsPlugin? iosImplementation =
+          flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>();
+      await iosImplementation?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
     }
   }
 
@@ -75,14 +97,31 @@ class NotificationService {
     // Linux does not support zonedSchedule in flutter_local_notifications yet.
     // We provide a fallback for Linux users to at least see immediate notifications or logs.
     if (Platform.isLinux) {
-      await flutterLocalNotificationsPlugin.show(
-        id: notificationId,
-        title: title,
-        body: body,
-        notificationDetails: const NotificationDetails(
-          linux: LinuxNotificationDetails(),
-        ),
-      );
+      final delay = scheduledTime.difference(DateTime.now());
+      if (delay.isNegative) {
+        // If it's in the past, show immediately
+        await flutterLocalNotificationsPlugin.show(
+          id: notificationId,
+          title: title,
+          body: body,
+          notificationDetails: const NotificationDetails(
+            linux: LinuxNotificationDetails(),
+          ),
+        );
+      } else {
+        // For Linux, we simulate scheduling using a Timer (works while app is running)
+        Timer(delay, () async {
+          await flutterLocalNotificationsPlugin.show(
+            id: notificationId,
+            title: title,
+            body: body,
+            notificationDetails: const NotificationDetails(
+              linux: LinuxNotificationDetails(),
+            ),
+          );
+        });
+        debugPrint('Linux: Scheduled notification "$title" in ${delay.inMinutes} minutes');
+      }
       return;
     }
 

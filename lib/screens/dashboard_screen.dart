@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import '../l10n/app_localizations.dart';
 import '../database/database_helper.dart';
 import '../models/customer.dart';
 import '../utils/theme.dart';
@@ -7,6 +7,8 @@ import 'customer_detail_screen.dart';
 import 'history_screen.dart';
 import 'settings_screen.dart';
 import '../services/notification_service.dart';
+import '../utils/ethiopian_calendar.dart';
+import '../utils/ethiopian_date_picker.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -42,10 +44,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('DUBE BOOK'),
+        title: Text(l.appName),
         actions: [
           IconButton(
             icon: const Icon(Icons.history_rounded, color: AppTheme.accentGreen),
@@ -53,7 +56,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.settings_rounded, color: AppTheme.textSecondary),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
+            onPressed: () async {
+              await Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
+              // Reload in case language changed
+              if (mounted) setState(() {});
+            },
           ),
         ],
       ),
@@ -64,9 +71,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
             child: Row(
               children: [
-                const Text(
-                  'PENDING DEBTS',
-                  style: TextStyle(
+                Text(
+                  l.pendingDebts,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
@@ -75,7 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const Spacer(),
                 Text(
-                  '${_unpaidCustomers.length} CUSTOMERS',
+                  l.customersCount(_unpaidCustomers.length),
                   style: TextStyle(fontSize: 10, color: AppTheme.textSecondary.withOpacity(0.5), fontWeight: FontWeight.bold),
                 ),
               ],
@@ -87,7 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               : _unpaidCustomers.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     itemCount: _unpaidCustomers.length,
                     itemBuilder: (context, index) {
                       final item = _unpaidCustomers[index];
@@ -113,16 +120,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddCustomerDialog,
         backgroundColor: AppTheme.primaryBlue,
-        label: const Text('NEW CUSTOMER', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        label: Text(l.newCustomer, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2)),
         icon: const Icon(Icons.person_add_rounded, color: Colors.white),
       ),
     );
   }
 
   Widget _buildHeroCard() {
+    final l = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(30),
@@ -145,9 +153,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'TOTAL OUTSTANDING',
-            style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2),
+          Text(
+            l.totalOutstanding,
+            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2),
           ),
           const SizedBox(height: 16),
           Row(
@@ -161,7 +169,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(width: 8),
               Text(
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white.withOpacity(0.7)),
-                  'Birr'
+                  l.birr
               ),
             ],
           ),
@@ -178,7 +186,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const Icon(Icons.trending_up_rounded, size: 16, color: AppTheme.accentGreen),
                 const SizedBox(width: 8),
                 Text(
-                  'Active Credit',
+                  l.activeCredit,
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white.withOpacity(0.9)),
                 ),
               ],
@@ -190,6 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -197,7 +206,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Icon(Icons.shield_moon_rounded, size: 100, color: AppTheme.textSecondary.withOpacity(0.1)),
           const SizedBox(height: 24),
           Text(
-            'NO CUSTOMERS FOUND',
+            l.noCustomersFound,
             style: TextStyle(
               color: AppTheme.textSecondary.withOpacity(0.3),
               fontWeight: FontWeight.w900,
@@ -211,6 +220,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showAddCustomerDialog() {
+    final l = AppLocalizations.of(context)!;
     final name = TextEditingController();
     DateTime? deadline;
     showDialog(
@@ -219,25 +229,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
         builder: (ctx, setState) => AlertDialog(
           backgroundColor: AppTheme.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28), side: BorderSide(color: Colors.white.withOpacity(0.1))),
-          title: const Text('REGISTER CUSTOMER', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.2)),
+          title: Text(l.registerCustomer, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.2)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: name,
                 style: const TextStyle(color: AppTheme.textPrimary),
-                decoration: const InputDecoration(labelText: 'Full Name', prefixIcon: Icon(Icons.person_outline, size: 20)),
+                decoration: InputDecoration(labelText: l.fullName, prefixIcon: const Icon(Icons.person_outline, size: 20)),
                 textCapitalization: TextCapitalization.words,
               ),
               const SizedBox(height: 20),
               InkWell(
                 onTap: () async {
-                  final d = await showDatePicker(
+                  final d = await showEthiopianDatePicker(
                     context: ctx,
-                    initialDate: DateTime.now().add(const Duration(days: 7)),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
-                    builder: (context, child) => Theme(data: AppTheme.darkTheme, child: child!),
+                    initialDate: DateTime.now(),
                   );
                   if (d != null) setState(() => deadline = d);
                 },
@@ -253,7 +260,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Icon(Icons.calendar_today_rounded, size: 18, color: deadline != null ? AppTheme.primaryBlue : AppTheme.textSecondary.withOpacity(0.3)),
                       const SizedBox(width: 12),
                       Text(
-                        deadline == null ? 'Set Payment Deadline' : DateFormat.yMMMd().format(deadline!),
+                        deadline == null ? l.setPaymentDeadline : EthiopianCalendar.fromGregorian(deadline!).format(locale: Localizations.localeOf(ctx).languageCode),
                         style: TextStyle(color: deadline == null ? AppTheme.textSecondary.withOpacity(0.5) : AppTheme.textPrimary, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -263,7 +270,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary))),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary))),
             ElevatedButton(
               onPressed: () async {
                 if (name.text.isEmpty) return;
@@ -276,9 +283,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     debugPrint('Notification scheduling failed: $e');
                   }
                 }
-                if (mounted) { Navigator.pop(ctx); _loadData(); }
+                if (context.mounted) { Navigator.pop(ctx); _loadData(); }
               },
-              child: const Text('REGISTER'),
+              child: Text(l.register),
             ),
           ],
         ),
@@ -298,6 +305,7 @@ class _AnimatedCustomerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return TweenAnimationBuilder(
       duration: Duration(milliseconds: 300 + (index * 80)),
       tween: Tween<double>(begin: 0, end: 1),
@@ -313,7 +321,7 @@ class _AnimatedCustomerTile extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: AppTheme.surface,
@@ -369,8 +377,8 @@ class _AnimatedCustomerTile extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           customer.deadline != null
-                            ? 'Due ${DateFormat.yMMMd().format(customer.deadline!)}'
-                            : 'No deadline set',
+                            ? l.dueDate(EthiopianCalendar.fromGregorian(customer.deadline!).format(locale: Localizations.localeOf(context).languageCode))
+                            : l.noDeadlineSet,
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -386,14 +394,14 @@ class _AnimatedCustomerTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${debt.toStringAsFixed(2)} Birr ',
+                    l.amountBirr(debt.toStringAsFixed(2)),
                     style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 19, color: AppTheme.accentGreen),
                   ),
                   if (isOverdue)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        'OVERDUE',
+                        l.overdue,
                         style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: AppTheme.error, letterSpacing: 1),
                       ),
                     ),

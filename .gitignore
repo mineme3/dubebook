@@ -11,7 +11,8 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-
+test.dart
+changenote.md
 # IntelliJ related
 *.iml
 *.ipr
@@ -32,6 +33,7 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+.history/
 
 # Symbolication related
 app.*.symbols

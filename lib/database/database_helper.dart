@@ -7,7 +7,7 @@ import '../models/user.dart';
 
 class DatabaseHelper {
   static const _databaseName = "Dubebook.db";
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
 
   static const tableUser = 'users';
   static const tableCustomer = 'customers';
@@ -31,6 +31,7 @@ class DatabaseHelper {
       path,
       version: _databaseVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -171,8 +172,33 @@ class DatabaseHelper {
     );
   }
   
+  Future<int> updateTransaction(AppTransaction transaction) async {
+    Database db = await instance.database;
+    return await db.update(
+      tableTransaction,
+      transaction.toMap(),
+      where: 'id = ?',
+      whereArgs: [transaction.id],
+    );
+  }
+
+  Future<int> markTransactionAsPaid(int id) async {
+    Database db = await instance.database;
+    return await db.update(
+      tableTransaction,
+      {'status': 1},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<int> deleteTransaction(int id) async {
     Database db = await instance.database;
     return await db.delete(tableTransaction, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // No schema changes needed for v2 — existing columns support all new features.
+    // This handler is here for safe migration if future versions require changes.
   }
 }

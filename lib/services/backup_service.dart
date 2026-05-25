@@ -11,7 +11,7 @@ class BackupService {
       
       final dbFile = File(dbPath);
       if (await dbFile.exists()) {
-        await Share.shareXFiles([XFile(dbPath)], text: 'Dubebook Database Backup');
+        await Share.shareXFiles([XFile(dbPath)], text: 'Dube Note Database Backup');
       } else {
         throw Exception("Database file not found.");
       }
