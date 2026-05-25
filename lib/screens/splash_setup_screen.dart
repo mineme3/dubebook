@@ -307,7 +307,7 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
           _buildField(
             _passwordController,
             l.createPinLabel,
-            Icons.dialpad_rounded,
+            Icons.lock_rounded,
             true,
             isNumber: true,
             validator: (v) {
