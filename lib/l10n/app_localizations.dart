@@ -226,6 +226,12 @@ abstract class AppLocalizations {
   /// **'Master Password'**
   String get masterPassword;
 
+  /// No description provided for @createPinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Create 4-Digit PIN'**
+  String get createPinLabel;
+
   /// No description provided for @recoveryQuestions.
   ///
   /// In en, this message translates to:
@@ -267,6 +273,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Must be at least 4 characters'**
   String get passwordMinLength;
+
+  /// No description provided for @pinExactDigits.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN must be exactly 4 digits'**
+  String get pinExactDigits;
+
+  /// No description provided for @pinNumericOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN must be numeric'**
+  String get pinNumericOnly;
 
   /// No description provided for @birthCityRequired.
   ///

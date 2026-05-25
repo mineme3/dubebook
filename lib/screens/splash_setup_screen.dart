@@ -306,14 +306,14 @@ class _SplashSetupScreenState extends State<SplashSetupScreen> with SingleTicker
           const SizedBox(height: 16),
           _buildField(
             _passwordController,
-            'Create 4-Digit PIN',
+            l.createPinLabel,
             Icons.password_rounded,
             true,
             isNumber: true,
             validator: (v) {
               if (v == null || v.isEmpty) return l.passwordRequired;
-              if (v.length != 4) return 'PIN must be exactly 4 digits';
-              if (int.tryParse(v) == null) return 'PIN must be numeric';
+              if (v.length != 4) return l.pinExactDigits;
+              if (int.tryParse(v) == null) return l.pinNumericOnly;
               return null;
             },
           ),

@@ -72,6 +72,9 @@ class AppLocalizationsAm extends AppLocalizations {
   String get masterPassword => 'ዋና የይለፍ ቃል';
 
   @override
+  String get createPinLabel => 'ባለ 4-አሃዝ PIN ይፍጠሩ';
+
+  @override
   String get recoveryQuestions => 'የማግኛ ጥያቄዎች';
 
   @override
@@ -91,6 +94,12 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get passwordMinLength => 'ቢያንስ 4 ቁምፊዎች መሆን አለበት';
+
+  @override
+  String get pinExactDigits => 'PIN በትክክል 4 አሃዞች መሆን አለበት';
+
+  @override
+  String get pinNumericOnly => 'PIN ቁጥር ብቻ መሆን አለበት';
 
   @override
   String get birthCityRequired => 'የትውልድ ከተማ ያስፈልጋል';

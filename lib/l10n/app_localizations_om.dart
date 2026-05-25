@@ -72,6 +72,9 @@ class AppLocalizationsOm extends AppLocalizations {
   String get masterPassword => 'Jecha Darbii Jalqabaa';
 
   @override
+  String get createPinLabel => 'PIN Lakkoofsa 4 Uumi';
+
+  @override
   String get recoveryQuestions => 'GAAFFILEE DEEBISUU';
 
   @override
@@ -92,6 +95,12 @@ class AppLocalizationsOm extends AppLocalizations {
 
   @override
   String get passwordMinLength => 'Yoo xiqqaate arfii 4 ta\'uu qaba';
+
+  @override
+  String get pinExactDigits => 'PIN lakkoofsa 4 qofa ta\'uu qaba';
+
+  @override
+  String get pinNumericOnly => 'PIN lakkoofsa qofa ta\'uu qaba';
 
   @override
   String get birthCityRequired => 'Magaalaan dhalootaa barbaachisaadha';

@@ -72,6 +72,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get masterPassword => 'Master Password';
 
   @override
+  String get createPinLabel => 'Create 4-Digit PIN';
+
+  @override
   String get recoveryQuestions => 'RECOVERY QUESTIONS';
 
   @override
@@ -92,6 +95,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordMinLength => 'Must be at least 4 characters';
+
+  @override
+  String get pinExactDigits => 'PIN must be exactly 4 digits';
+
+  @override
+  String get pinNumericOnly => 'PIN must be numeric';
 
   @override
   String get birthCityRequired => 'Birth city is required';

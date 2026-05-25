@@ -25,6 +25,7 @@
 
   "secureSetup": "QINDAA'INA NAGEENYA",
   "masterPassword": "Jecha Darbii Jalqabaa",
+  "createPinLabel": "PIN Lakkoofsa 4 Uumi",
   "recoveryQuestions": "GAAFFILEE DEEBISUU",
   "birthCity": "Magaalaa Dhalootaa",
   "openingYear": "Bara Banamsaa (Itoophiyaa)",
@@ -32,6 +33,8 @@
   "dataSecureNote": "Daataan keessan meeshaa kana qofa irratti kuufame.",
   "passwordRequired": "Jechni darbii barbaachisaadha",
   "passwordMinLength": "Yoo xiqqaate arfii 4 ta'uu qaba",
+  "pinExactDigits": "PIN lakkoofsa 4 qofa ta'uu qaba",
+  "pinNumericOnly": "PIN lakkoofsa qofa ta'uu qaba",
   "birthCityRequired": "Magaalaan dhalootaa barbaachisaadha",
   "yearRequired": "Barri barbaachisaadha",
   "yearExactDigits": "Lakkoofsa 4 qofa ta'uu qaba",

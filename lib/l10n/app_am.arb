@@ -25,6 +25,7 @@
 
   "secureSetup": "ደህንነት ማዋቀር",
   "masterPassword": "ዋና የይለፍ ቃል",
+  "createPinLabel": "ባለ 4-አሃዝ PIN ይፍጠሩ",
   "recoveryQuestions": "የማግኛ ጥያቄዎች",
   "birthCity": "የትውልድ ከተማ",
   "openingYear": "የመክፈቻ ዓመት (ኢትዮጵያ)",
@@ -32,6 +33,8 @@
   "dataSecureNote": "መረጃዎ በዚህ መሣሪያ ላይ ብቻ ተከማችቷል።",
   "passwordRequired": "የይለፍ ቃል ያስፈልጋል",
   "passwordMinLength": "ቢያንስ 4 ቁምፊዎች መሆን አለበት",
+  "pinExactDigits": "PIN በትክክል 4 አሃዞች መሆን አለበት",
+  "pinNumericOnly": "PIN ቁጥር ብቻ መሆን አለበት",
   "birthCityRequired": "የትውልድ ከተማ ያስፈልጋል",
   "yearRequired": "ዓመት ያስፈልጋል",
   "yearExactDigits": "በትክክል 4 አሃዞች መሆን አለበት",
