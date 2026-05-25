@@ -321,6 +321,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changeLanguage => 'CHANGE LANGUAGE';
 
   @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get changePasswordDescription => 'Update your access credentials';
+
+  @override
   String quantityTimesPrice(int qty, String price) {
     return '$qty x Birr $price';
   }

@@ -387,11 +387,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.check_circle_rounded, color: Colors.white),
+                  icon: const Icon(Icons.check_circle_rounded, color: AppTheme.accentGreen),
                   onPressed: _markSelectedAsPaid,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_rounded, color: Colors.white),
+                  icon: const Icon(Icons.delete_rounded, color: Colors.red),
                   onPressed: _deleteSelectedCustomers,
                 ),
               ],

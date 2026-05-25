@@ -23,7 +23,7 @@
   - **Add Transaction Layout**: Bottom sheet or dialog to input amount and description.
 
 ## 4. History Screen (`history_screen.dart`)
-- **Purpose**: Global ledger view.
+- **Purpose**: All ledger view.
 - **Components**:
   - **List View**: Chronological list of all app transactions across all customers. Helpful for end-of-day cash reconciliation.
 

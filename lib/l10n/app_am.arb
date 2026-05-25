@@ -107,6 +107,8 @@
   "language": "ቋንቋ",
   "languageDescription": "የመተግበሪያ ቋንቋ ይቀይሩ",
   "changeLanguage": "ቋንቋ ቀይር",
+  "changePassword": "የይለፍ ቃል ቀይር",
+  "changePasswordDescription": "የመግቢያ ምስጢር ቁጥርዎን ያድሱ",
 
   "quantityTimesPrice": "{qty} x ብር {price}",
   "birrAmount": "ብር {amount}",

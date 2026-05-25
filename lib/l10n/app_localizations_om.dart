@@ -321,6 +321,12 @@ class AppLocalizationsOm extends AppLocalizations {
   String get changeLanguage => 'AFAAN JIJJIIRI';
 
   @override
+  String get changePassword => 'Jecha Darbii Jijjiiri';
+
+  @override
+  String get changePasswordDescription => 'Oodeffannoo seensaa kee jijjiiri';
+
+  @override
   String quantityTimesPrice(int qty, String price) {
     return '$qty x Birrii $price';
   }

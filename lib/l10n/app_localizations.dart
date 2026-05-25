@@ -682,6 +682,18 @@ abstract class AppLocalizations {
   /// **'CHANGE LANGUAGE'**
   String get changeLanguage;
 
+  /// No description provided for @changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// No description provided for @changePasswordDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Update your access credentials'**
+  String get changePasswordDescription;
+
   /// No description provided for @quantityTimesPrice.
   ///
   /// In en, this message translates to:

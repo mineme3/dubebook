@@ -39,6 +39,7 @@ DubeBook is a mobile application built with Flutter, tailored for managing infor
 
 ## 7. UX Decisions and Rationale
 - **Offline-First**: Driven by device constraints and connectivity issues in the target demographic. SQLite used for immediate persistence.
+- **Simplicity prioritized**: Driven by simpilicity first the shop owner can register the customer in one click of button and also add the credit in one click of the button.
 - **Electric Blue Theme on Light Background**: High contrast ensures visibility outdoors and in bright sunlight (Physical Context).
 - **Hero Card UI**: Emphasizes the most critical business metric—total unrecovered money—at a quick glance.
 - **Ethiopian Date Picker**: Completely custom-built calendar picker addressing a significant localization requirement that standard libraries fail to meet.
@@ -50,5 +51,5 @@ DubeBook is a mobile application built with Flutter, tailored for managing infor
 
 ## 9. Future Scalability Recommendations
 - Cloud backup integration for robust data preservation.
-- Partial payment support to handle staggered debt recovery.
+- Automatic online backup.
 - Customer notification system for enhanced debt collection.

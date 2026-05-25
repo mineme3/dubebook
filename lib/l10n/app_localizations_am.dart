@@ -317,6 +317,12 @@ class AppLocalizationsAm extends AppLocalizations {
   String get changeLanguage => 'ቋንቋ ቀይር';
 
   @override
+  String get changePassword => 'የይለፍ ቃል ቀይር';
+
+  @override
+  String get changePasswordDescription => 'የመግቢያ ምስጢር ቁጥርዎን ያድሱ';
+
+  @override
   String quantityTimesPrice(int qty, String price) {
     return '$qty x ብር $price';
   }

@@ -107,6 +107,8 @@
   "language": "Afaan",
   "languageDescription": "Afaan appii jijjiiri",
   "changeLanguage": "AFAAN JIJJIIRI",
+  "changePassword": "Jecha Darbii Jijjiiri",
+  "changePasswordDescription": "Oodeffannoo seensaa kee jijjiiri",
 
   "quantityTimesPrice": "{qty} x Birrii {price}",
   "birrAmount": "Birrii {amount}",

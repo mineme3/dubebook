@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/backup_service.dart';
 import '../services/locale_service.dart';
+import '../services/auth_service.dart';
 import '../utils/theme.dart';
 import '../main.dart';
 
@@ -117,6 +118,28 @@ class SettingsScreen extends StatelessWidget {
                 color: AppTheme.textPrimary,
                 fontSize: 14,
               ),
+            ),
+          ),
+          _buildSettingsTile(
+            icon: Icons.vpn_key_rounded,
+            title: Text(
+              l.changePassword,
+              style: const TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              l.changePasswordDescription,
+              style: const TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 14,
+              ),
+            ),
+            onTap: () => showDialog(
+              context: context,
+              builder: (_) => const ChangePasswordDialog(),
             ),
           ),
           const SizedBox(height: 64),
@@ -268,5 +291,149 @@ class SettingsScreen extends StatelessWidget {
         trailing: onTap != null ? const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white24, size: 16) : null,
       ),
     );
+  }
+}
+
+class ChangePasswordDialog extends StatefulWidget {
+  const ChangePasswordDialog({super.key});
+
+  @override
+  State<ChangePasswordDialog> createState() => _ChangePasswordDialogState();
+}
+
+class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
+  final _q1 = TextEditingController();
+  final _q2 = TextEditingController();
+  final _pass = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _err = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return AlertDialog(
+      backgroundColor: AppTheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: Colors.white.withOpacity(0.1)),
+      ),
+      title: Text(
+        l.changePassword.toUpperCase(),
+        style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 16),
+      ),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_err)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    l.securityAnswersIncorrect,
+                    style: const TextStyle(
+                      color: AppTheme.error,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              _field(
+                controller: _q1,
+                label: l.placeOfBirth,
+                icon: Icons.location_on_rounded,
+                validator: (val) => val == null || val.trim().isEmpty ? l.birthCityRequired : null,
+              ),
+              const SizedBox(height: 16),
+              _field(
+                controller: _q2,
+                label: l.yearShopOpened,
+                icon: Icons.calendar_today_rounded,
+                validator: (val) => val == null || val.trim().isEmpty ? l.yearRequired : null,
+              ),
+              const SizedBox(height: 16),
+              _field(
+                controller: _pass,
+                label: l.createNewPassword,
+                icon: Icons.vpn_key_rounded,
+                obscure: true,
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return l.passwordRequired;
+                  }
+                  if (val.length < 4) {
+                    return l.passwordMinLength;
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryBlue,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          onPressed: () async {
+            if (!_formKey.currentState!.validate()) return;
+
+            final ok = await AuthService.resetPassword(
+              _q1.text,
+              _q2.text,
+              _pass.text,
+            );
+            if (ok && mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(l.passwordResetSuccess),
+                  backgroundColor: AppTheme.accentGreen,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            } else {
+              setState(() => _err = true);
+            }
+          },
+          child: Text(l.confirm),
+        ),
+      ],
+    );
+  }
+
+  Widget _field({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool obscure = false,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      validator: validator,
+      style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, size: 20, color: AppTheme.primaryBlue),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _q1.dispose();
+    _q2.dispose();
+    _pass.dispose();
+    super.dispose();
   }
 }

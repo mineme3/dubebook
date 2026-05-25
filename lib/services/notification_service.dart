@@ -42,7 +42,7 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
     
     // Request permissions for Android 13+
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
@@ -50,7 +50,7 @@ class NotificationService {
     }
 
     // Request permissions for iOS
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       final IOSFlutterLocalNotificationsPlugin? iosImplementation =
           flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>();
@@ -96,7 +96,7 @@ class NotificationService {
   }) async {
     // Linux does not support zonedSchedule in flutter_local_notifications yet.
     // We provide a fallback for Linux users to at least see immediate notifications or logs.
-    if (Platform.isLinux) {
+    if (defaultTargetPlatform == TargetPlatform.linux) {
       final delay = scheduledTime.difference(DateTime.now());
       if (delay.isNegative) {
         // If it's in the past, show immediately

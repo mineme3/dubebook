@@ -114,6 +114,8 @@
   "language": "Language",
   "languageDescription": "Change application language",
   "changeLanguage": "CHANGE LANGUAGE",
+  "changePassword": "Change Password",
+  "changePasswordDescription": "Update your access credentials",
 
   "quantityTimesPrice": "{qty} x Birr {price}",
   "@quantityTimesPrice": { "placeholders": { "qty": { "type": "int" }, "price": { "type": "String" } } },

@@ -50,7 +50,7 @@ The application handles the complete credit lifecycle — from registering custo
 
 ### Authentication and Onboarding
 
-![Authentication and onboarding screen](public/mockups/screen.png)
+![Authentication and onboarding screen](public/mockups/mockup.png)
 
 This screen represents the first-use flow, where the app sets up secure local access before the user enters the main credit management experience.
 
@@ -146,7 +146,6 @@ cd dubebook
 
 # Install dependencies
 flutter pub get
-
 # Run on Android
 flutter run
 
