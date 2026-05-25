@@ -1,20 +1,21 @@
 # State Management Analysis
 
 ## 1. Current Implementation
-DubeBook currently utilizes **Vanilla Flutter State Management (`setState`)** exclusively.
+DubeBook utilizes **Riverpod (using Notifiers and Providers)** as its core state management stack.
 
 ### Key Observations:
-- **No External Libraries**: Provider, Riverpod, Bloc, or GetX are **not** present in the `pubspec.yaml` dependencies.
-- **Component-Level State**: State variables (`_isLoading`, `_unpaidCustomers`, `_totalUnpaid`) are held within the `State` class of individual screens (e.g., `_DashboardScreenState`).
-- **Data Flow**: Data is fetched asynchronously via `DatabaseHelper`, and `setState` is called to rebuild the UI with the fresh data.
-- **Global State**: Global app state (like Theme and Locale) is managed at the root `DubeNoteApp` widget, which exposes static methods (e.g., `DubeNoteApp.setLocale`) to trigger a root-level `setState`.
+- **Declarative & Reactive**: UI widgets extend `ConsumerWidget` or `ConsumerStatefulWidget` and react immediately to state changes via `ref.watch()`.
+- **Async Handling**: Reuses Riverpod's `AsyncValue` construct to natively represent loading, error, and data states in UI templates.
+- **Unidirectional Flow**: The UI dispatches requests to Riverpod notifiers, which mutate state via repository classes and trigger cascading updates using dependency invalidations (`ref.invalidate()`).
+- **Global Providers**:
+  - `authNotifierProvider`: Manages owner session, JWT cache, registration, and logout states.
+  - `customerNotifierProvider`: Handles the customer list and updates reactively on additions/deletions.
+  - `customerSummaryProvider`: Fetch family summary aggregating details, credits, and payments.
+  - `creditItemsProvider`: Fetches and maintains items.
+  - `paymentHistoryProvider`: Exposes recorded transaction records.
 
-## 2. Why this was selected
-- **Simplicity**: For a small-to-medium app dealing strictly with local SQLite reads/writes, `setState` prevents the boilerplate and cognitive load associated with Bloc or Riverpod.
-- **Performance**: Given that data mutations are explicit (e.g., adding a customer and popping back to the dashboard), reloading the query locally is fast and visually seamless.
-
-## 3. Scalability & Recommendations
-While `setState` works perfectly now, scaling the app (e.g., adding Cloud Sync, multi-device real-time updates, or complex filtering) will result in "prop drilling" and massive UI rebuilding.
-
-**Recommendation for Scaling**:
-If the project introduces backend syncing or complex authentication flows, migrating to **Riverpod** or **Provider** is recommended. This will allow the `DatabaseHelper` streams to be consumed directly in the UI without manual `setState` orchestration.
+## 2. Benefits
+- **No Boilerplate**: Boilerplate-free asynchronous data fetching.
+- **Auto-Caching & Garbage Collection**: Automatically handles memory lifecycle for family providers.
+- **Separation of Concerns**: UI code does not touch database/repository models directly; state orchestration is contained inside Notifiers.
+- **Testability**: Riverpod providers can be easily overridden in tests to mock network behavior.

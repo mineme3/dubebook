@@ -3,43 +3,32 @@
 ## 1. Mobile UX Context Analysis
 
 ### 1.1 Physical Context
-- **Outdoor Usage & Bright Sunlight**: The app uses a high-contrast theme (`AppTheme.primaryBlue` which is `0xFF1010A0`, and white `0xFFFFFFFF` background) to maintain legibility under harsh sunlight typical in street-facing shops.
-- **Dark Mode Usage**: Currently, the `darkTheme` configuration in `theme.dart` actually implements a light, high-contrast UI. To improve, a true AMOLED black dark mode should be introduced for night-time usage in low-light environments.
-- **One-hand Interaction**: Key interactions (FAB, bottom navigation elements) are placed within the natural thumb zone.
+- **AMOLED Dark Mode**: Optimized for outdoor readability and low light operations using curated slate and midnight dark styles.
+- **One-hand Interaction**: Core interactive paths (FABs, action buttons) are situated inside thumb zones.
 
 ### 1.2 Temporal Context
-- **Quick Actions & Micro Moments**: The transaction logging process involves minimal fields (amount, description). This satisfies the "fast completion workflow" necessary when a merchant is serving a queue of customers.
-- **Time-sensitive Tasks**: The dashboard sorts/flags overdue customers using red (`AppTheme.error`), allowing merchants to prioritize debt collection.
+- **Quick Logging**: Minimal steps for registering customer records, logging credits, and completing transactions during high-traffic store hours.
+- **Urgency Indicators**: Dashboard prominently labels expired or overdue items using red visual indicators, alerting owners at first glance.
 
 ### 1.3 Cognitive Context
-- **Mental Load**: Avoids complex graphs. Uses a single big "Hero Card" showing the total outstanding debt. Simple color coding (Green for payments, Blue for debt, Red for overdue).
-- **Error Prevention**: Forms use text capitalization for names and specific keyboard types for numeric entry.
+- **Aggregated Financial Hero**: Hero statistics summarize totals for outstanding balance, total paid, and total debts to simplify business health review.
+- **Ethiopian Date Picker integration**: Uses the localized Ethiopian calendar systems instead of Gregorian date entries, reducing conversion errors.
 
 ### 1.4 Device Context
-- **Small Screens**: Use of `ListView` with constrained card padding ensures usability on budget Android devices.
-- **Offline Situations**: 100% offline data flow via SQLite. There are no loading spinners waiting for network requests, matching the "weak network" requirement flawlessly.
-- **Performance**: Animated lists (`TweenAnimationBuilder`) are fast and lightweight, providing visual feedback without heavily impacting GPU rendering.
+- **Network Resiliency**: Form requests provide explicit visual error boundaries and loading overlays to keep the user informed during network operations.
+- **Secure Token Caching**: Session checks operate seamlessly behind the scenes, using secure local token caching to prevent repetitive logins.
 
 ---
 
 ## 2. UX Research & Validation Plan
 
-### 2.1 Qualitative Methods
-- **User Interviews**: 
-  - Interview 5-10 shop owners currently using paper ledgers. 
-  - Focus on frustrations with debt calculation and language barriers.
-- **Usability Testing**:
-  - Task 1: "Add a customer named Abebe with a deadline of next week (in Ethiopian Calendar)."
-  - Task 2: "Log a payment of 500 Birr from Abebe."
-  - Task 3: "Change the app language to Amharic."
-- **Diary Studies**: Ask a shop owner to use DubeBook parallel to their paper ledger for one week and report discrepancies or speed issues.
+### 2.1 Usability Tasks
+- **Task 1**: "Register a customer named Abebe with telegram username abebe_store."
+- **Task 2**: "Add a credit item for Abebe (e.g. 5kg Sugar) with a deadline next month in the Ethiopian Calendar."
+- **Task 3**: "Record a payment of 1,200 Birr and verify the projected balance updates in real-time."
 
 ### 2.2 Quantitative Methods
-- **Analytics (Future Implementation)**: 
-  - Implement local, anonymous usage tracking (e.g., SQLite logging).
-  - Track: Drop-off in the "Add Transaction" screen, usage frequency of the Ethiopian Date Picker vs typing.
-- **Heatmaps & Session Recordings**:
-  - Track scroll depth on the Dashboard. Are merchants missing customers at the bottom of the list?
-- **A/B Testing**:
-  - Test FAB placement (Bottom Right vs Bottom Center).
-  - Test Hero Card visibility (Expanded vs Collapsible).
+- **API Metrics Monitoring**:
+  - Analyze server response times for customer lists and search queries.
+- **Error Audit Logs**:
+  - Track authentication failures, expired tokens, and Telegram bot notification delivery logs.

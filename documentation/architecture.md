@@ -1,33 +1,37 @@
 # Architecture Documentation
 
 ## 1. Macroarchitecture
-The application utilizes a **Feature-first / Layered Architecture** with an emphasis on simplicity and offline-first capabilities.
-Because the app is relatively small and isolated to local execution, it does not use a rigid Clean Architecture, but instead follows an MVC-inspired pattern standard to vanilla Flutter.
+The application utilizes a modern **Cloud-Native / Feature-First / Layered Architecture** with an emphasis on scalability, real-time synchronization, and robust state management.
+
+The application has been migrated from local-only SQLite to a cloud-synchronized system communicating with a **Dart Frog** API backend backed by **MongoDB Atlas**.
 
 ### Layers:
-1. **Presentation Layer (`screens/`, `utils/`)**:
-   - Contains UI definitions, Themes, and localization logic.
-   - UI states are held directly within StatefulWidgets.
-2. **Domain Layer (`models/`)**:
-   - Contains pure Dart data classes (`Customer`, `AppTransaction`, `User`).
-3. **Data/Service Layer (`database/`, `services/`)**:
-   - `DatabaseHelper` (SQLite bindings).
-   - Abstractions for Notifications, Backups, and Auth.
+1. **Presentation Layer (`features/*/screens/`, `shared/widgets/`, `utils/`)**:
+   - Contains UI definitions, Themes, custom pickers, and localization logic.
+   - Declarative and reactive widgets that consume and react to Riverpod providers.
+2. **Domain Layer (`core/models/`)**:
+   - Contains pure Dart data classes representing MongoDB Atlas collections (`Owner`, `Customer`, `CreditItem`, `PaymentRecord`).
+3. **State Management Layer (`features/*/providers/`, `core/providers/`)**:
+   - Built on **Riverpod** (`AsyncNotifier`, `FutureProvider`, etc.) for unidirectional data flow, caching, and dependency injection.
+4. **Data/Service Layer (`features/*/repositories/`, `core/network/`, `core/storage/`)**:
+   - `ApiClient` (Dio client with JWT Interceptor).
+   - CRUD Repositories communicating with the Dart Frog backend.
+   - `SecureStorageHelper` utilizing `flutter_secure_storage` for token and owner profile caching.
 
 ## 2. Microarchitecture Details
 
-### 2.1 Repository & Singleton Patterns
-- **DatabaseHelper**: Implemented as a Singleton (`DatabaseHelper.instance`). It acts as the sole Repository for fetching and mutating SQLite data. This prevents concurrent lock issues on the local database file.
-  
-### 2.2 Services Integration
-- Separate service classes handle platform-specific implementations:
-  - `NotificationService`: Wraps `flutter_local_notifications`.
-  - `LocaleService`: Wraps `SharedPreferences` for localization state.
-  - `AuthService`: Simple authentication abstraction.
+### 2.1 State Management (Riverpod)
+- Handled declaratively with self-invalidating providers (e.g. invalidating customer state when a payment is recorded or credit item added).
+- Asynchronous states are safely handled using `AsyncValue` to show loading, error, and data states elegantly.
 
-### 2.3 Dependency Injection
-- Currently, the application relies on global singletons (`DatabaseHelper.instance`, `NotificationService()`) rather than a formal Dependency Injection container (like `get_it`). This is acceptable given the limited scope, but a DI container is recommended for future scalability.
+### 2.2 Navigation (GoRouter)
+- Declarative router defined in `lib/core/router/app_router.dart`.
+- Dynamic path matching (e.g. `/customers/:id`) and redirection guards based on JWT validation.
+
+### 2.3 Network Interceptors
+- A custom Bearer interceptor automatically injects authorization tokens.
+- Global 401 Unauthorized handling automatically logs the user out and redirects back to the `/login` screen if a token expires.
 
 ### 2.4 Error Handling
-- Handled locally within asynchronous UI calls using standard `try-catch` blocks.
-- Failed DB transactions roll back automatically via SQLite mechanisms.
+- Server errors are returned as JSON response messages and surfaced safely in the UI.
+- Local configurations and variables are safely loaded with fallbacks using `flutter_dotenv`.

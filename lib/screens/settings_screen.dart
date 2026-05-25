@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../l10n/app_localizations.dart';
-import '../services/backup_service.dart';
 import '../services/locale_service.dart';
-import '../services/auth_service.dart';
+import '../core/providers/auth_provider.dart';
 import '../utils/theme.dart';
 import '../main.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context)!;
+    final authState = ref.watch(authNotifierProvider);
+    final owner = authState.owner;
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
@@ -20,48 +24,69 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          _buildSectionHeader(l.databaseManagement),
-          _buildSettingsTile(
-            icon: Icons.cloud_upload_rounded,
-            title: Text(
-              l.exportLocalBackup,
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),  
-            ),
-            subtitle: Text(
-              l.exportDescription,
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 12,
+          if (owner != null) ...[
+            _buildSectionHeader('OWNER PROFILE'),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppTheme.textSecondary.withOpacity(0.1)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBlue.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.person_rounded,
+                      color: AppTheme.primaryBlue,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          owner.fullName,
+                          style: const TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          owner.email,
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          owner.phone,
+                          style: TextStyle(
+                            color: AppTheme.textSecondary.withOpacity(0.8),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            onTap: () async {
-              try {
-                await BackupService.exportDatabase();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l.databaseExportSuccess, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      backgroundColor: AppTheme.accentGreen,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l.exportFailed(e.toString())),
-                      backgroundColor: AppTheme.error,
-                    ),
-                  );
-                }
-              }
-            },
-          ),
-          const SizedBox(height: 32),
+            const SizedBox(height: 24),
+          ],
           _buildSectionHeader(l.language.toUpperCase()),
           _buildSettingsTile(
             icon: Icons.translate_rounded,
@@ -76,11 +101,59 @@ class SettingsScreen extends StatelessWidget {
             subtitle: Text(
               l.languageDescription,
               style: const TextStyle(
-                color: AppTheme.textPrimary,
+                color: AppTheme.textSecondary,
                 fontSize: 12,
               ),
             ),
             onTap: () => _showLanguageDialog(context),
+          ),
+          const SizedBox(height: 24),
+          _buildSectionHeader('ACCOUNT SECURITY'),
+          _buildSettingsTile(
+            icon: Icons.logout_rounded,
+            title: const Text(
+              'Logout',
+              style: TextStyle(
+                color: AppTheme.error,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: const Text(
+              'Sign out from this device',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+            onTap: () async {
+              final ok = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: AppTheme.surface,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                  title: const Text('Logout', style: TextStyle(fontWeight: FontWeight.w900, color: AppTheme.error)),
+                  content: const Text('Are you sure you want to log out?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              );
+              if (ok == true) {
+                await ref.read(authNotifierProvider.notifier).logout();
+                if (context.mounted) {
+                  context.go('/login');
+                }
+              }
+            },
           ),
           const SizedBox(height: 32),
           _buildSectionHeader(l.applicationInfo),
@@ -97,62 +170,40 @@ class SettingsScreen extends StatelessWidget {
             subtitle: Text(
               l.version,
               style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          _buildSettingsTile( 
-            icon: Icons.fingerprint_rounded,
-            title: Text(
-              l.securityEngine,
-              style: const TextStyle(
-                color: AppTheme.textPrimary, 
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              )
-            ),
-            subtitle: Text(
-              l.localOnlyArchitecture,
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 14,
+                color: AppTheme.textSecondary,
+                fontSize: 12,
               ),
             ),
           ),
           _buildSettingsTile(
-            icon: Icons.vpn_key_rounded,
-            title: Text(
-              l.changePassword,
-              style: const TextStyle(
+            icon: Icons.cloud_done_rounded,
+            title: const Text(
+              'Cloud Architecture',
+              style: TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            subtitle: Text(
-              l.changePasswordDescription,
-              style: const TextStyle(
-                color: AppTheme.textPrimary,
-                fontSize: 14,
+            subtitle: const Text(
+              'Synchronized with MongoDB Atlas',
+              style: TextStyle(
+                color: AppTheme.textSecondary,
+                fontSize: 12,
               ),
             ),
-            onTap: () => showDialog(
-              context: context,
-              builder: (_) => const ChangePasswordDialog(),
-            ),
           ),
-          const SizedBox(height: 64),
+          const SizedBox(height: 48),
           Center(
             child: Opacity(
               opacity: 0.2,
               child: Column(
                 children: [
-                  const Icon(Icons.wallet_rounded, size: 48, color: Colors.white),
+                  const Icon(Icons.wallet_rounded, size: 48, color: AppTheme.primaryBlue),
                   const SizedBox(height: 8),
                   Text(
                     l.appName,
-                    style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 4),
+                    style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 4, color: AppTheme.textPrimary),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -252,10 +303,10 @@ class SettingsScreen extends StatelessWidget {
       child: Text(
         title,
         style: const TextStyle(
-          color: AppTheme.primaryBlue, 
-          fontWeight: FontWeight.w900, 
-          fontSize: 12, 
-          letterSpacing: 2
+          color: AppTheme.primaryBlue,
+          fontWeight: FontWeight.w900,
+          fontSize: 12,
+          letterSpacing: 2,
         ),
       ),
     );
@@ -267,7 +318,7 @@ class SettingsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: AppTheme.textSecondary.withOpacity(0.1)),
       ),
       child: ListTile(
         onTap: onTap,
@@ -281,159 +332,15 @@ class SettingsScreen extends StatelessWidget {
           child: Icon(icon, color: AppTheme.primaryBlue, size: 24),
         ),
         title: title is String
-            ? Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16))
+            ? Text(title, style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w800, fontSize: 16))
             : title,
         subtitle: subtitle != null
             ? (subtitle is String
                 ? Text(subtitle, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontWeight: FontWeight.w500))
                 : subtitle)
             : null,
-        trailing: onTap != null ? const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white24, size: 16) : null,
+        trailing: onTap != null ? const Icon(Icons.arrow_forward_ios_rounded, color: AppTheme.textSecondary, size: 16) : null,
       ),
     );
-  }
-}
-
-class ChangePasswordDialog extends StatefulWidget {
-  const ChangePasswordDialog({super.key});
-
-  @override
-  State<ChangePasswordDialog> createState() => _ChangePasswordDialogState();
-}
-
-class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
-  final _q1 = TextEditingController();
-  final _q2 = TextEditingController();
-  final _pass = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-  bool _err = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
-    return AlertDialog(
-      backgroundColor: AppTheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: Colors.white.withOpacity(0.1)),
-      ),
-      title: Text(
-        l.changePassword.toUpperCase(),
-        style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 16),
-      ),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_err)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                    l.securityAnswersIncorrect,
-                    style: const TextStyle(
-                      color: AppTheme.error,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              _field(
-                controller: _q1,
-                label: l.placeOfBirth,
-                icon: Icons.location_on_rounded,
-                validator: (val) => val == null || val.trim().isEmpty ? l.birthCityRequired : null,
-              ),
-              const SizedBox(height: 16),
-              _field(
-                controller: _q2,
-                label: l.yearShopOpened,
-                icon: Icons.calendar_today_rounded,
-                validator: (val) => val == null || val.trim().isEmpty ? l.yearRequired : null,
-              ),
-              const SizedBox(height: 16),
-              _field(
-                controller: _pass,
-                label: l.createNewPassword,
-                icon: Icons.vpn_key_rounded,
-                obscure: true,
-                validator: (val) {
-                  if (val == null || val.isEmpty) {
-                    return l.passwordRequired;
-                  }
-                  if (val.length < 4) {
-                    return l.passwordMinLength;
-                  }
-                  return null;
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(l.cancel, style: const TextStyle(color: AppTheme.textSecondary)),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.primaryBlue,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          onPressed: () async {
-            if (!_formKey.currentState!.validate()) return;
-
-            final ok = await AuthService.resetPassword(
-              _q1.text,
-              _q2.text,
-              _pass.text,
-            );
-            if (ok && mounted) {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l.passwordResetSuccess),
-                  backgroundColor: AppTheme.accentGreen,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            } else {
-              setState(() => _err = true);
-            }
-          },
-          child: Text(l.confirm),
-        ),
-      ],
-    );
-  }
-
-  Widget _field({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    bool obscure = false,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      validator: validator,
-      style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, size: 20, color: AppTheme.primaryBlue),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _q1.dispose();
-    _q2.dispose();
-    _pass.dispose();
-    super.dispose();
   }
 }

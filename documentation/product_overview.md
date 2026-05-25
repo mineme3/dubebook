@@ -1,55 +1,47 @@
 # Product Overview: DubeBook
 
 ## 1. Product Overview
-DubeBook is a mobile application built with Flutter, tailored for managing informal shop credit systems (locally known as "Dube"). Operating with an offline-first architecture powered by SQLite, it provides local merchants with a digital replacement for manual ledger books. DubeBook currently supports multiple local languages (Amharic, Oromo, English) and utilizes native Ethiopian Calendar systems to perfectly fit the temporal context of its target audience.
+DubeBook is a modern mobile and desktop application built with Flutter, tailored for managing informal shop credit systems (locally known as "Dube"). Operating with a secure cloud-native architecture powered by a **Dart Frog API** and **MongoDB Atlas**, it provides local merchants with a digital replacement for manual ledger books. DubeBook supports multiple local languages (Amharic, Oromo, English) and utilizes native Ethiopian Calendar systems to perfectly fit the temporal context of its target audience.
 
 ## 2. Project Objectives
-- Transition manual, paper-based ledger systems to a secure and resilient digital solution.
-- Enhance the accuracy of debt calculations and transaction histories.
-- Ensure 100% offline functionality to accommodate areas with unstable internet connections.
+- Transition manual, paper-based ledger systems to a secure and resilient cloud-synchronized solution.
+- Enhance the accuracy of debt calculations and transaction histories with automated backend operations.
 - Support local customs, languages, and calendar systems (Ethiopian Calendar) inherently.
+- Connect shop owners and customers using Telegram notifications.
 
 ## 3. Business Goals
-- Improve credit recovery rates for local business owners by addressing frequent disputes.
+- Improve credit recovery rates for local business owners by providing automated Telegram payment deadline reminders.
 - Provide structured repayment tracking and easy tracking of total customer debt.
-- Ensure efficient reminder mechanisms for overdue payments.
-- Maintain transaction history for accountability.
+- Maintain transparent transaction history for accountability.
 
 ## 4. User Personas
 **1. The Local Merchant (Shop Owner)**
-- **Needs**: Fast entry, clear visibility of total outstanding debts, reminder of overdues, and offline reliability.
+- **Needs**: Fast entry, clear visibility of total outstanding debts, reminder of overdues, and cross-device sync.
 - **Pain Points**: Losing physical ledgers, calculating accumulated debt manually, translating Gregorian dates to local Ethiopian dates.
 
 ## 5. User Journey Map
-1. **Onboarding/Splash**: User enters the app, authenticates if configured, selects their preferred language (Amharic/Oromo/English).
-2. **Dashboard**: User sees the total outstanding money (Hero Card) and a list of all customers with pending debts.
-3. **Adding a Customer**: User taps the FAB to register a new customer, setting an optional Ethiopian Calendar deadline.
-4. **Logging a Transaction**: User selects a customer and navigates to the detailed view, logging new items taken on credit or payments made.
-5. **Reviewing History**: User opens the History screen to review recent transactions for end-of-day reconciliation.
+1. **Authentication**: User logs in securely or registers a new owner account (FullName, ShopName, Telegram Chat ID, Email, Password).
+2. **Dashboard**: User sees the total outstanding money (Hero Card) and a list of all customers with pending debts, categorized by status (Active, Settled, Overdue).
+3. **Adding a Customer**: User registers a new customer setting a name, address, phone number, and telegram username.
+4. **Logging Credit Items**: User logs new items taken on credit, specifying quantity, unit price, and an Ethiopian Calendar deadline.
+5. **Recording Payments**: User records payments (Cash, Mobile Money, Bank Transfer) which immediately decrement the customer's outstanding balance.
+6. **Notification Logs**: User monitors successfully scheduled/delivered automated reminders.
 
 ## 6. Information Architecture
 ```
 [ App Root ]
- ├── Splash/Auth Screen
+ ├── Login / Register Screen
  ├── Dashboard (Unpaid Customers + Hero Stats)
- │    ├── Customer Details (Transactions & Add Transaction)
- │    ├── Settings (Language, Backup, Theme, App Lock)
- │    └── History (Global Transaction Logs)
+ │    ├── Customer Details (Credit Items List & Payment History Tabs)
+ │    │    ├── Add Credit Item (Ethiopian Calendar Deadline picker)
+ │    │    └── Record Payment (Projected balance after payment indicator)
+ │    ├── Settings (Language, Dark Theme, Owner Profile Card, Logout)
+ │    └── Notifications Log (Logs for telegram deliveries)
 ```
 
 ## 7. UX Decisions and Rationale
-- **Offline-First**: Driven by device constraints and connectivity issues in the target demographic. SQLite used for immediate persistence.
-- **Simplicity prioritized**: Driven by simpilicity first the shop owner can register the customer in one click of button and also add the credit in one click of the button.
-- **Electric Blue Theme on Light Background**: High contrast ensures visibility outdoors and in bright sunlight (Physical Context).
-- **Hero Card UI**: Emphasizes the most critical business metric—total unrecovered money—at a quick glance.
+- **Cloud-Native Integration**: Ensures data integrity, preventing data loss if a device is stolen, broken, or replaced.
+- **Simplicity prioritized**: Driven by simplicity first—the shop owner can register a customer or log a credit item with minimal taps.
 - **Ethiopian Date Picker**: Completely custom-built calendar picker addressing a significant localization requirement that standard libraries fail to meet.
-
-## 8. Accessibility
-- High-contrast text on surfaces (WCAG AA compliant).
-- Use of clear icons paired with text labels.
-- Sizable tap targets (Minimum 48x48 logical pixels) for key actions (FAB, list items, buttons).
-
-## 9. Future Scalability Recommendations
-- Cloud backup integration for robust data preservation.
-- Automatic online backup.
-- Customer notification system for enhanced debt collection.
+- **Automatic Telegram Notifications**: Backend sweep runs daily, dispatching reminders directly to customers' Telegram accounts.
+- **JWT Auth Protection**: Ensures that owner ledger details are accessible only via authorized devices.

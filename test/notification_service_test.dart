@@ -1,64 +1,102 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:mocktail/mocktail.dart';
 import 'package:dubebook/services/notification_service.dart';
+
+class MockAndroidLocalNotifications extends Mock
+    with MockPlatformInterfaceMixin
+    implements AndroidFlutterLocalNotificationsPlugin {}
+
+class FakeTZDateTime extends Fake implements tz.TZDateTime {}
+class FakeAndroidNotificationDetails extends Fake implements AndroidNotificationDetails {}
+class FakeAndroidInitializationSettings extends Fake implements AndroidInitializationSettings {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  setUpAll(() {
+    tz.initializeTimeZones();
+    registerFallbackValue(FakeTZDateTime());
+    registerFallbackValue(FakeAndroidNotificationDetails());
+    registerFallbackValue(FakeAndroidInitializationSettings());
+    registerFallbackValue(AndroidScheduleMode.exactAllowWhileIdle);
+  });
+
   group('NotificationService Tests', () {
-    final List<MethodCall> methodCalls = [];
-    const MethodChannel channel = MethodChannel('dexterous.com/flutter/local_notifications');
+    late MockAndroidLocalNotifications mockPlatform;
 
     setUp(() {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      methodCalls.clear();
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-        methodCalls.add(methodCall);
-        if (methodCall.method == 'initialize') {
-          return true;
-        }
-        return null;
-      });
+      mockPlatform = MockAndroidLocalNotifications();
+      
+      // Register the mock platform implementation
+      FlutterLocalNotificationsPlatform.instance = mockPlatform;
+
+      // Stub platform initialize method with correct named parameters
+      when(() => mockPlatform.initialize(
+            settings: any(named: 'settings'),
+            onDidReceiveNotificationResponse: any(named: 'onDidReceiveNotificationResponse'),
+            onDidReceiveBackgroundNotificationResponse: any(named: 'onDidReceiveBackgroundNotificationResponse'),
+          )).thenAnswer((_) async => true);
+
+      // Stub requestNotificationsPermission
+      when(() => mockPlatform.requestNotificationsPermission())
+          .thenAnswer((_) async => true);
+
+      // Stub zonedSchedule with named arguments
+      when(() => mockPlatform.zonedSchedule(
+            id: any(named: 'id'),
+            title: any(named: 'title'),
+            body: any(named: 'body'),
+            scheduledDate: any(named: 'scheduledDate'),
+            notificationDetails: any(named: 'notificationDetails'),
+            scheduleMode: any(named: 'scheduleMode'),
+            payload: any(named: 'payload'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          )).thenAnswer((_) async => {});
+
+      when(() => mockPlatform.cancel(
+            id: any(named: 'id'),
+          )).thenAnswer((_) async => {});
     });
 
     tearDown(() {
       debugDefaultTargetPlatformOverride = null;
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(channel, null);
     });
 
-    testWidgets('scheduleDeadlineNotification triggers correct method channel calls', (WidgetTester tester) async {
+    test('scheduleDeadlineNotification triggers correct platform calls', () async {
       final service = NotificationService();
       await service.init();
       
-      // Clear calls from init
-      methodCalls.clear();
-
       // Schedule a deadline for yesterday. 
       // The logic in NotificationService will change this to 5 minutes from now.
       final deadline = DateTime.now().subtract(const Duration(days: 1));
       await service.scheduleDeadlineNotification(1, 'John Doe', deadline);
 
-      // On Android/iOS, it directly calls zonedSchedule
-      final zonedCalls = methodCalls.where((c) => c.method == 'zonedSchedule').toList();
-      expect(zonedCalls.isNotEmpty, true, reason: 'Expected zonedSchedule to be called');
-      expect(zonedCalls.first.arguments['title'], 'Payment Deadline: John Doe');
+      verify(() => mockPlatform.zonedSchedule(
+            id: 2,
+            title: 'Payment Deadline: John Doe',
+            body: any(named: 'body'),
+            scheduledDate: any(named: 'scheduledDate'),
+            notificationDetails: any(named: 'notificationDetails'),
+            scheduleMode: any(named: 'scheduleMode'),
+            payload: any(named: 'payload'),
+            matchDateTimeComponents: any(named: 'matchDateTimeComponents'),
+          )).called(1);
     });
 
-    testWidgets('cancelNotification triggers cancel method channel call', (WidgetTester tester) async {
+    test('cancelNotification triggers cancel platform call', () async {
       final service = NotificationService();
       await service.init();
-      methodCalls.clear();
 
       await service.cancelNotification(1);
 
-      final cancelCalls = methodCalls.where((c) => c.method == 'cancel').toList();
-      // Should cancel ID * 2 and ID * 2 + 1
-      expect(cancelCalls.length, 2);
-      expect(cancelCalls[0].arguments, 2); // ID * 2
-      expect(cancelCalls[1].arguments, 3); // ID * 2 + 1
+      verify(() => mockPlatform.cancel(id: 2)).called(1);
+      verify(() => mockPlatform.cancel(id: 3)).called(1);
     });
   });
 }

@@ -13,6 +13,7 @@
 migrate_working_dir/
 test.dart
 changenote.md
+*.env
 # IntelliJ related
 *.iml
 *.ipr
