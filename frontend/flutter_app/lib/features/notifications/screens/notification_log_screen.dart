@@ -150,7 +150,7 @@ class NotificationLogScreen extends ConsumerWidget {
                                 title,
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
-                                  color: isRead ? tokens.onSurfaceMuted : tokens.onSurface,
+                                  color: isRead ? tokens.onSurfaceMuted : AppTheme.textPrimary,
                                 ),
                               ),
                             ),
@@ -166,7 +166,7 @@ class NotificationLogScreen extends ConsumerWidget {
                           message,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontSize: 14,
-                            color: isRead ? tokens.onSurfaceMuted : tokens.onSurface,
+                            color: isRead ? tokens.onSurfaceMuted : AppTheme.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
