@@ -1,18 +1,19 @@
-<p align="center">
-  <img src="assets/images/app_icon_foreground.png" alt="Dube Note Logo" width="120" />
+  <p align="center">
+  <img src="frontend/flutter_app/assets/images/app_icon.png" alt="Dube Note Logo" width="120" />
 </p>
 
 <h1 align="center">Dube Note</h1>
 
 <p align="center">
-  <strong>Offline-first credit management system for small retail businesses</strong>
+  <strong>Online credit management system for small retail businesses</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Desktop-blue?style=flat-square" alt="Platform" />
+  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20Desktop-blue?style=flat-square" alt="Platform" />
   <img src="https://img.shields.io/badge/Framework-Flutter-02569B?style=flat-square&logo=flutter" alt="Flutter" />
-  <img src="https://img.shields.io/badge/Database-SQLite-003B57?style=flat-square&logo=sqlite" alt="SQLite" />
-  <img src="https://img.shields.io/badge/Version-1.0.0-green?style=flat-square" alt="Version" />
+  <img src="https://img.shields.io/badge/Backend-Cloud%20API-informational?style=flat-square" alt="Backend" />
+  <img src="https://img.shields.io/badge/Database-Cloud%20Hosted-003B57?style=flat-square" alt="Database" />
+  <img src="https://img.shields.io/badge/Version-2.0.0-green?style=flat-square" alt="Version" />
   <img src="https://img.shields.io/badge/License-Private-lightgrey?style=flat-square" alt="License" />
 </p>
 
@@ -20,29 +21,37 @@
 
 ## Overview
 
-**Dube Note** is a production-grade mobile application purpose-built for small retail shop owners who extend informal credit to their customers. It replaces the traditional paper-based "dube" (credit notebook) with a secure, fast, and reliable digital system that works entirely offline.
+**Dube Note** is a production-grade mobile and web application purpose-built for small retail shop owners who extend informal credit to their customers. It replaces the traditional paper-based "dube" (credit notebook) with a secure, always-in-sync digital system.
 
-The application handles the complete credit lifecycle — from registering customers and recording individual item-level transactions, to calculating outstanding balances in real-time, settling debts, and maintaining a full payment history.
+Shop owners **create their own account** on sign-up and log in from any device. Once inside, they **register customers by assigning each one a unique username**, then record item-level credit transactions against that username. Because all data is stored centrally in the cloud, a shop owner's customer list and balances stay consistent whether they log in from a phone, tablet, or desktop — and nothing is lost if a device is replaced.
+
+The application handles the complete credit lifecycle — from creating a shop owner account and registering customers, to recording transactions, calculating outstanding balances in real time, settling debts, and maintaining a full payment history — all synced online.
 
 ---
 
 ## Key Features
 
+### Shop Owner Accounts
+- **Account Registration** — Shop owners sign up with an email/username and password to create their own private workspace.
+- **Secure Login** — Returning shop owners log in from any supported device; sessions are authenticated against the cloud backend.
+- **Multi-Device Access** — Data follows the shop owner's account, not the device — switch phones or add a desktop client without losing history.
+
 ### Customer & Credit Management
-- **Customer Registry** — Register customers with optional payment deadlines; view all active debtors sorted by outstanding balance.
+- **Username-Based Customer Registry** — Register customers under a unique username per shop; look up, open, or edit a customer's record instantly by searching their username.
 - **Item-Level Transactions** — Record each credit entry with item name, quantity, and unit price. Totals are computed automatically.
-- **Real-Time Debt Calculation** — Outstanding balances are derived dynamically from unpaid transactions, eliminating desync errors inherent in manual bookkeeping.
+- **Real-Time Debt Calculation** — Outstanding balances are derived dynamically from unpaid transactions and kept in sync across devices, eliminating desync errors inherent in manual bookkeeping.
 - **One-Tap Settlement** — Settle a customer's full balance in a single action; all unpaid transactions transition to the paid history archive.
 
 ### Security & Privacy
-- **100% Offline Architecture** — Zero network dependencies. No external APIs, no cloud sync, no telemetry. All data resides exclusively on the device.
-- **Password-Protected Access** — The application is secured behind a SHA-256 hashed master password, set on first launch.
-- **Security Question Recovery** — Forgot-password flow via two user-defined security questions (city of birth & year shop opened), with answers stored locally.
-- **Automatic Session Lock** — Idle sessions are terminated after 5 minutes of inactivity, automatically returning to the login screen.
+- **Encrypted Cloud Sync** — All data is transmitted over HTTPS/TLS and stored in a managed cloud database tied to the shop owner's account.
+- **Authenticated Access** — Access is gated behind the shop owner's account credentials, verified against the backend on each session.
+- **Password Recovery** — Standard email- or security-question-based account recovery flow for shop owners who forget their password.
+- **Automatic Session Timeout** — Idle sessions are terminated after a period of inactivity, requiring re-authentication.
 
-### Notifications & Backups
-- **Deadline Reminders** — Local push notifications alert the shop owner one day before and on the day of a customer's payment deadline. Fully configured for both **Android** (exact alarms) and **iOS** (alert, badge, and sound permissions requested at runtime via `DarwinInitializationSettings`).
-- **Database Export** — One-tap backup exports the raw SQLite `.db` file via the native share sheet — send it to email, Google Drive, or any storage medium.
+### Notifications & Sync
+- **Deadline Reminders** — Push notifications alert the shop owner one day before and on the day of a customer's payment deadline, delivered via cloud messaging on **Android** and **iOS**.
+- **Live Data Sync** — Changes made on one device (a new transaction, a settlement, a new customer) appear on any other device the shop owner is logged into, typically within seconds.
+- **Cloud Backups** — Since data lives in the cloud, backups are automatic; a manual export option is still available for the shop owner's own records.
 
 ---
 
@@ -52,53 +61,58 @@ The application handles the complete credit lifecycle — from registering custo
 
 ![Authentication and onboarding screen](public/mockups/mockup.png)
 
-This screen represents the first-use flow, where the app sets up secure local access before the user enters the main credit management experience.
+This screen represents the shop owner's sign-up / login flow, where the app authenticates against the cloud backend before the user enters the main credit management experience.
 
 ### Customer Management Flow
 
-The same interface supports the day-to-day workflow for reviewing balances, opening customer records, and moving from active credit to paid history.
+The same interface supports the day-to-day workflow: searching a customer by username, reviewing balances, opening customer records, and moving from active credit to paid history.
 
 ---
 
 ## Architecture
 
-Dube Note follows a clean, layered architecture designed for maintainability and simplicity without over-engineering.
+Dube Note follows a clean, layered architecture with a thin client and a cloud-hosted backend responsible for authentication, data storage, and sync.
 
 ```
 lib/
-├── main.dart                   # App entry point, session management
-├── database/
-│   └── database_helper.dart    # SQLite schema, CRUD operations, queries
+├── main.dart                     # App entry point, session management
+├── network/
+│   └── api_client.dart           # HTTP client, request/response handling, auth headers
 ├── models/
-│   ├── customer.dart           # Customer entity (name, note, deadline)
-│   ├── app_transaction.dart    # Transaction entity (item, qty, price, status)
-│   └── user.dart               # User entity (password hash, security answers)
+│   ├── shop_owner.dart           # Shop owner entity (username, email, auth token)
+│   ├── customer.dart             # Customer entity (username, name, note, deadline)
+│   ├── app_transaction.dart      # Transaction entity (item, qty, price, status)
 ├── services/
-│   ├── auth_service.dart       # Password hashing, login, setup, recovery
-│   ├── backup_service.dart     # Database file export via share sheet
-│   └── notification_service.dart # Scheduled local notifications (timezone-aware)
+│   ├── auth_service.dart         # Sign-up, login, token refresh, password recovery
+│   ├── customer_service.dart     # Register/search/manage customers by username
+│   ├── transaction_service.dart  # Create, sync, and settle transactions
+│   └── notification_service.dart # Push notification registration & handling
 ├── screens/
-│   ├── splash_setup_screen.dart  # First-launch onboarding & password setup
-│   ├── login_screen.dart         # Authentication & password recovery
-│   ├── dashboard_screen.dart     # Main view: total debt, customer list
+│   ├── splash_screen.dart          # Session check & auto-login
+│   ├── signup_screen.dart          # Shop owner account creation
+│   ├── login_screen.dart           # Shop owner authentication & recovery
+│   ├── dashboard_screen.dart       # Main view: total debt, customer list
 │   ├── customer_detail_screen.dart # Per-customer balance & transaction list
+│   ├── add_customer_screen.dart    # Register a new customer by username
 │   ├── add_transaction_screen.dart # New credit entry form
-│   ├── history_screen.dart       # Paid transaction archive
-│   └── settings_screen.dart      # Backup export & app info
+│   ├── history_screen.dart         # Paid transaction archive
+│   └── settings_screen.dart        # Account, sync status, app info
 └── utils/
-    └── theme.dart              # Design system: colors, typography, components
+    └── theme.dart                # Design system: colors, typography, components
 ```
 
 ### Tech Stack
 
 | Layer              | Technology                                                                 |
-|--------------------|---------------------------------------------------------------------------|
+|--------------------|-----------------------------------------------------------------------------|
 | **Framework**      | [Flutter](https://flutter.dev/) (Dart)                                    |
-| **Local Database** | [sqflite](https://pub.dev/packages/sqflite) / sqflite_common_ffi          |
-| **Authentication** | SHA-256 hashing via [crypto](https://pub.dev/packages/crypto)             |
-| **Notifications**  | [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications) — Android (exact alarms, channels) + iOS (Darwin alerts, badge, sound) + timezone scheduling |
-| **Backup/Share**   | [share_plus](https://pub.dev/packages/share_plus)                         |
-| **State Mgmt**     | `StatefulWidget` + `FutureBuilder` (deliberately minimal, no external state libraries) |
+| **Backend API**     | Cloud-hosted REST/HTTPS API handling auth, customers, and transactions    |
+| **Database**       | Cloud-hosted managed database (shop owners, customers, transactions)       |
+| **Authentication** | Token-based auth (issued on login, refreshed per session)                 |
+| **Notifications**  | Push notifications via cloud messaging — Android + iOS                    |
+| **State Mgmt**     | `StatefulWidget` + `FutureBuilder`/async streams for live sync             |
+
+> **Note:** The specific backend/database provider (e.g., a custom REST API, Firebase, or Supabase) should be documented here to match your actual implementation — update this section with the real service name, hosting details, and any required environment configuration once finalized.
 
 ---
 
@@ -109,17 +123,18 @@ lib/
            │
            ▼
   ┌─────────────────┐           ┌─────────────────┐           ┌─────────────────┐
-  │  FIRST LAUNCH   │           │  SETUP SCREEN   │           │    DASHBOARD    │
-  │  (Auth Check)   │ ────────▶ │ (Password + SQ) │ ────────▶ │ (Customer List) │
+  │  FIRST LAUNCH   │           │  SIGN UP SCREEN │           │    DASHBOARD    │
+  │  (Auth Check)   │ ────────▶ │ (Shop Owner Acct)│ ────────▶ │ (Customer List) │
   └─────────────────┘           └─────────────────┘           └────────┬────────┘
            │                                                           │
            │ (If account exists)                                       │
            ▼                                                           │
   ┌─────────────────┐                                  ┌───────────────┼───────────────┐
   │  LOGIN SCREEN   │                                  ▼               ▼               ▼
-  │   (Password)    │ ────────▶                ┌───────────────┐ ┌───────────┐   ┌──────────┐
-  └─────────────────┘                          │ CUSTOMER INFO │ │  HISTORY  │   │ SETTINGS │
-                                               └───────┬───────┘ └───────────┘   └──────────┘
+  │  (Username/Pwd) │ ────────▶                ┌───────────────┐ ┌───────────┐   ┌──────────┐
+  └─────────────────┘                          │ ADD CUSTOMER  │ │  HISTORY  │   │ SETTINGS │
+                                               │ (by Username) │ └───────────┘   └──────────┘
+                                               └───────┬───────┘
                                                        │
                                                        ▼
                                                ┌───────────────┐
@@ -135,7 +150,8 @@ lib/
 
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.11.5+)
 - Android Studio or VS Code with Flutter/Dart plugins
-- A physical device or emulator (Android/iOS)
+- A physical device, emulator, or web browser
+- Access to a running instance of the Dube Note backend API (or its configured base URL)
 
 ### Installation
 
@@ -146,59 +162,64 @@ cd dubebook
 
 # Install dependencies
 flutter pub get
+
+# Configure the backend API base URL
+# (e.g., in a .env file or lib/network/api_client.dart)
+
 # Run on Android
 flutter run
 
 # Run on iOS (requires macOS with Xcode)
 cd ios && pod install && cd ..
 flutter run --device-id <ios-device-or-simulator>
+
+# Run on Web
+flutter run -d chrome
 ```
 
 ### First Launch
 
-1. **Set a master password** — minimum 4 characters.
-2. **Answer two security questions** — city of birth and the Ethiopian calendar year your shop opened.
-3. **Start managing credit** — you'll be taken directly to the dashboard.
+1. **Create a shop owner account** — sign up with a username/email and password.
+2. **Log in** — authenticate against the cloud backend from any device.
+3. **Register your first customer** — assign them a unique username to identify them going forward.
+4. **Start managing credit** — record transactions, track balances, and settle debts, all synced online.
 
-> Your data never leaves the device. There is no account creation, no sign-up, and no internet requirement.
+> Data is tied to your shop owner account and stored in the cloud, so it's available wherever you log in.
 
 ---
 
 ## Model
 
 ```
-┌──────────┐       ┌──────────────┐       ┌──────────────┐
-│  users   │       │  customers   │       │ transactions │
-├──────────┤       ├──────────────┤       ├──────────────┤
-│ id (PK)  │       │ id (PK)      │◄──────│ id (PK)      │
-│ password │       │ name         │  1:N  │ customer_id  │
-│ _hash    │       │ note         │       │ item_name    │
-│ security │       │ deadline     │       │ quantity     │
-│ _q1      │       │ created_at   │       │ price        │
-│ _q2      │       │              │       │ total        │
-└──────────┘       └──────────────┘       │ status (0/1) │
-                                          │ date         │
-                                          └──────────────┘
-                                          0 = Unpaid
-                                          1 = Paid
+┌──────────────┐       ┌──────────────┐       ┌──────────────┐
+│ shop_owners  │       │  customers   │       │ transactions │
+├──────────────┤       ├──────────────┤       ├──────────────┤
+│ id (PK)      │       │ id (PK)      │◄──────│ id (PK)      │
+│ username     │◄──────│ shop_owner_id│  1:N  │ customer_id  │
+│ email        │  1:N  │ username     │       │ item_name    │
+│ password_hash│       │ name         │       │ quantity     │
+│ created_at   │       │ note         │       │ price        │
+└──────────────┘       │ deadline     │       │ total        │
+                        │ created_at  │       │ status (0/1) │
+                        └──────────────┘       │ date         │
+                                               └──────────────┘
+                                               0 = Unpaid
+                                               1 = Paid
 ```
+
+Each shop owner's customers and transactions are scoped to their account; customer usernames are unique within a given shop owner's workspace.
 
 ---
 
 ## Currency
 
-Dube Note uses **Ethiopian Birr (ETB)** as the default currency, reflecting its target market of small Ethiopian retail shops. The Ethiopian calendar is also used for the security question during setup.
+Dube Note uses **Ethiopian Birr (ETB)** as the default currency, reflecting its target market of small Ethiopian retail shops.
 
 ---
 
-## Backup & Recovery
+## Sync & Data Access
 
-Navigate to **Settings → Export Local Backup** to share the SQLite database file via:
-- Email attachment
-- Google Drive / cloud storage
-- Local file transfer
-
-The exported `.db` file contains all customer records, transactions, and authentication data.
+All customer records, transactions, and balances are stored on the backend and associated with the shop owner's account. There is no manual export required for day-to-day use, though an optional data export can still be offered from **Settings** for shop owners who want a local copy of their records.
 
 ---
 
@@ -206,8 +227,9 @@ The exported `.db` file contains all customer records, transactions, and authent
 
 - **Minimal Taps** — Core actions (add customer, add credit, settle debt) require the fewest possible interactions.
 - **High Contrast Light Theme** — Optimized for outdoor readability and quick scanning in a shop environment.
-- **Information Hierarchy** — Outstanding totals and customer names are typographically prominent; secondary data is subdued.
+- **Information Hierarchy** — Outstanding totals and customer usernames are typographically prominent; secondary data is subdued.
 - **Animated Transitions** — Smooth fade and slide animations provide spatial context without sacrificing speed.
+- **Resilient Sync** — The UI reflects sync/loading state clearly so shop owners always know whether their latest changes have been saved online.
 
 ---
 
@@ -215,10 +237,11 @@ The exported `.db` file contains all customer records, transactions, and authent
 
 | Platform | Status | Notes |
 |----------|--------|-------|
-| **Android** | ✅ Fully supported | Primary target. Exact alarm notifications, adaptive icons configured. |
-| **iOS** | ✅ Fully supported | Darwin notification permissions (alert, badge, sound) requested at runtime. SafeArea handles notch/Dynamic Island. |
-| **Linux** | ⚠️ Partial | Runs via `sqflite_common_ffi`. Notifications fallback to immediate display (no scheduled support). |
-| **Windows** | ⚠️ Partial | Runs via `sqflite_common_ffi`. Notification scheduling not supported. |
+| **Android** | ✅ Fully supported | Primary target. Push notifications, adaptive icons configured. |
+| **iOS** | ✅ Fully supported | Push notification permissions (alert, badge, sound) requested at runtime. SafeArea handles notch/Dynamic Island. |
+| **Web** | ✅ Supported | Full account and credit management available from a browser. |
+| **Linux** | ⚠️ Partial | Core features work via the API client; notification support may be limited. |
+| **Windows** | ⚠️ Partial | Core features work via the API client; notification support may be limited. |
 | **macOS** | ⚠️ Partial | Builds but not primary target. |
 
 ---
