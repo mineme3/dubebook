@@ -104,6 +104,53 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<bool> loginWithGoogle({
+    required String email,
+    required String fullName,
+    required String googleId,
+    String? shopName,
+    String? businessType,
+    required String role,
+  }) async {
+    try {
+      state = const AuthState.unknown();
+      final result = await _repo.googleAuth(
+        email: email,
+        fullName: fullName,
+        googleId: googleId,
+        shopName: shopName,
+        businessType: businessType,
+        role: role,
+      );
+      state = AuthState.authenticated(result.owner);
+      return true;
+    } catch (e) {
+      state = AuthState.unauthenticated(_extractErrorMessage(e, 'Google authentication failed'));
+      return false;
+    }
+  }
+
+  Future<String?> forgotPassword(String email) async {
+    try {
+      return await _repo.forgotPassword(email);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<bool> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      await _repo.resetPassword(email: email, code: code, newPassword: newPassword);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     await _repo.logout();
     state = const AuthState.unauthenticated();

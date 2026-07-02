@@ -245,18 +245,40 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
         children: [
           const Icon(Icons.calendar_today_outlined, color: AppTheme.primary),
           const SizedBox(width: 16),
-          Text(deadlineStr, style: theme.textTheme.bodyLarge?.copyWith(color: _deadline != null ? AppTheme.textPrimary : AppTheme.textMuted)),
-          const Spacer(),
-          if (_deadline != null) const Icon(Icons.check_circle, color: AppTheme.primary, size: 20),
+          Expanded(
+            child: Text(
+              deadlineStr,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: _deadline != null ? AppTheme.textPrimary : AppTheme.textMuted,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          if (_deadline != null) ...[
+            IconButton(
+              icon: const Icon(Icons.clear, color: AppTheme.error, size: 20),
+              constraints: const BoxConstraints(),
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                setState(() {
+                  _deadline = null;
+                  _ethiopianDeadline = null;
+                });
+              },
+            ),
+            const SizedBox(width: 12),
+            const Icon(Icons.check_circle, color: AppTheme.primary, size: 20),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildSummaryAndSave(AppLocalizations l10n) {
+    final tokens = Theme.of(context).extension<DubeTokens>()!;
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(color: AppTheme.background, border: Border(top: BorderSide(color: Color(0xFFE2E8F0)))),
+      decoration: BoxDecoration(color: AppTheme.background, border: Border(top: BorderSide(color: tokens.surfaceBorder))),
       child: Row(
         children: [
           Expanded(

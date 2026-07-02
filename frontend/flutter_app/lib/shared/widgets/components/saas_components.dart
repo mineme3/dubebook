@@ -34,11 +34,11 @@ class SaaSButton extends StatelessWidget {
           const SizedBox(
             height: 16,
             width: 16,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.background),
           )
         else ...[
           if (icon != null) ...[
-            Icon(icon, size: 18, color: variant == SaaSButtonVariant.primary ? Colors.white : theme.colorScheme.primary),
+            Icon(icon, size: 18, color: variant == SaaSButtonVariant.primary ? AppTheme.background : theme.colorScheme.primary),
             const SizedBox(width: 4),
           ],
           Flexible(
@@ -62,7 +62,7 @@ class SaaSButton extends StatelessWidget {
           onPressed: isLoading ? null : onPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor: theme.primaryColor,
-            foregroundColor: Colors.white,
+            foregroundColor: AppTheme.background,
           ),
           child: content,
         );
@@ -103,6 +103,7 @@ class SaaSCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<DubeTokens>()!;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -111,7 +112,7 @@ class SaaSCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: color ?? Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF64748B).withOpacity(0.15)),
+          border: Border.all(color: tokens.surfaceBorder),
         ),
         child: child,
       ),
@@ -143,9 +144,9 @@ class SaaSStatCard extends StatelessWidget {
     final tokens = theme.extension<DubeTokens>()!;
     final isPrimary = usePrimaryColor;
 
-    final textColor = isPrimary ? Colors.white70 : tokens.onSurfaceMuted;
-    final valueTextColor = isPrimary ? Colors.white : (valueColor ?? theme.colorScheme.onSurface);
-    final iconColor = isPrimary ? Colors.white70 : tokens.onSurfaceMuted;
+    final textColor = isPrimary ? AppTheme.background.withOpacity(0.7) : tokens.onSurfaceMuted;
+    final valueTextColor = isPrimary ? AppTheme.background : (valueColor ?? theme.colorScheme.onSurface);
+    final iconColor = isPrimary ? AppTheme.background.withOpacity(0.7) : tokens.onSurfaceMuted;
 
     return SaaSCard(
       color: isPrimary ? theme.primaryColor : null,
@@ -193,7 +194,7 @@ class SaaSStatCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: isPrimary ? Colors.white60 : theme.colorScheme.primary,
+                color: isPrimary ? tokens.onSurfaceMuted : theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -262,7 +263,7 @@ class SaaSEmptyState extends StatelessWidget {
               decoration: BoxDecoration(
                 color: tokens.surfaceLow,
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: tokens.surfaceBorder),
               ),
               child: Icon(icon, size: 48, color: theme.colorScheme.primary),
             ),

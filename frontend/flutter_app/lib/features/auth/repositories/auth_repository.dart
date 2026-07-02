@@ -74,6 +74,65 @@ class AuthRepository {
     );
   }
 
+  Future<({String token, Owner owner})> googleAuth({
+    required String email,
+    required String fullName,
+    required String googleId,
+    String? shopName,
+    String? businessType,
+    required String role,
+  }) async {
+    final response = await _dio.post(
+      '/auth/google',
+      data: {
+        'email': email,
+        'fullName': fullName,
+        'googleId': googleId,
+        'shopName': shopName,
+        'businessType': businessType,
+        'role': role,
+      },
+    );
+
+    final data = response.data as Map<String, dynamic>;
+    final token = data['token'] as String;
+    final ownerData = data['user'] as Map<String, dynamic>;
+
+    // Store auth data securely
+    await SecureStorageHelper.instance.saveToken(token);
+    await SecureStorageHelper.instance
+        .saveOwnerProfile(jsonEncode(ownerData));
+
+    return (
+      token: token,
+      owner: Owner.fromJson(ownerData),
+    );
+  }
+
+  Future<String> forgotPassword(String email) async {
+    final response = await _dio.post(
+      '/auth/forgot-password',
+      data: {'email': email},
+    );
+    final data = response.data as Map<String, dynamic>;
+    return data['code'] as String;
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    await _dio.post(
+      '/auth/reset-password',
+      data: {
+        'email': email,
+        'code': code,
+        'newPassword': newPassword,
+      },
+    );
+  }
+
   Future<String> refreshToken(String currentToken) async {
     final response = await _dio.post(
       '/auth/refresh',

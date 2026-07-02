@@ -210,7 +210,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
             decoration: BoxDecoration(
               color: tokens.surfaceLow,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: tokens.surfaceBorder),
             ),
             child: TabBar(
               controller: _tabController,
@@ -218,7 +218,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
               dividerHeight: 0,
               indicator: BoxDecoration(color: AppTheme.primary, borderRadius: BorderRadius.circular(18)),
               indicatorSize: TabBarIndicatorSize.tab,
-              labelColor: Colors.white,
+              labelColor: AppTheme.background,
               unselectedLabelColor: tokens.onSurfaceMuted,
               labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
               tabs: [Tab(text: l10n.timeline), Tab(text: l10n.payments)],
@@ -296,6 +296,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
   }
 
   Widget _buildActionFooter(Customer c, List<CreditSession> sessions, AppLocalizations l10n) {
+    final tokens = Theme.of(context).extension<DubeTokens>()!;
     final activeSessionsCount = sessions.where((s) => !s.isPaid).length;
     final blocked = _sessionLimitHit && activeSessionsCount >= 2;
 
@@ -303,7 +304,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppTheme.background,
-        border: const Border(top: BorderSide(color: Color(0xFFE2E8F0))),
+        border: Border(top: BorderSide(color: tokens.surfaceBorder)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -416,7 +417,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                   border: Border.all(color: AppTheme.background, width: 2),
                 ),
               ),
-              Expanded(child: Container(width: 2, color: const Color(0xFFE2E8F0))),
+              Expanded(child: Container(width: 2, color: tokens.surfaceBorder)),
             ],
           ),
           const SizedBox(width: 16),
@@ -489,7 +490,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                           ],
                         ),
                       )),
-                      if (session.items.isNotEmpty) const Divider(height: 24, color: Color(0xFFE2E8F0)),
+                      if (session.items.isNotEmpty) Divider(height: 24, color: tokens.surfaceBorder),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

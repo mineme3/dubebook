@@ -105,6 +105,39 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     const SizedBox(height: 32),
 
                     SaaSButton(label: l10n.createAccountBtn, isLoading: _loading, onPressed: _register),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: tokens.surfaceBorder)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text('OR', style: TextStyle(color: AppTheme.textMuted, fontSize: 12, fontWeight: FontWeight.bold)),
+                        ),
+                        Expanded(child: Divider(color: tokens.surfaceBorder)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: tokens.surfaceBorder),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () => _handleGoogleSignIn(context),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.network(
+                            'https://img.icons8.com/color/48/google-logo.png',
+                            height: 20,
+                            width: 20,
+                            errorBuilder: (context, error, stackTrace) => Icon(Icons.login, color: AppTheme.primary),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text('Continue with Google', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 24),
 
                     Row(
@@ -125,6 +158,148 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleGoogleSignIn(BuildContext context) async {
+    String shopName = _shopName.text.trim();
+    if (_selectedRole == 'SHOP_OWNER' && shopName.isEmpty) {
+      final promptedName = await showDialog<String>(
+        context: context,
+        builder: (ctx) {
+          final controller = TextEditingController();
+          return AlertDialog(
+            title: const Text('Enter Shop Name'),
+            content: TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Shop Name',
+                hintText: 'e.g., Alazar Grocery',
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('CANCEL')),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx, controller.text.trim()),
+                child: const Text('CONTINUE'),
+              ),
+            ],
+          );
+        },
+      );
+      if (promptedName == null || promptedName.isEmpty) return;
+      shopName = promptedName;
+      _shopName.text = shopName;
+    }
+
+    if (!mounted) return;
+    final selectedAccount = await showModalBottomSheet<Map<String, String>>(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        final accounts = [
+          {'name': 'Salih Team', 'email': 'salih@gmail.com', 'id': 'google_123456789'},
+          {'name': 'Dube Shop Owner', 'email': 'test_owner@gmail.com', 'id': 'google_owner_test'},
+          {'name': 'Dube Customer', 'email': 'test_customer@gmail.com', 'id': 'google_customer_test'},
+        ];
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  'Choose an account to continue to Dubebook',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                ),
+              ),
+              const Divider(height: 1),
+              ...accounts.map((acc) {
+                final tokens = Theme.of(ctx).extension<DubeTokens>()!;
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: tokens.infoMuted,
+                    child: Text(acc['name']![0].toUpperCase(), style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                  ),
+                  title: Text(acc['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(acc['email']!),
+                  onTap: () => Navigator.pop(ctx, acc),
+                );
+              }),
+              const Divider(height: 1),
+              ListTile(
+                leading: const CircleAvatar(child: Icon(Icons.add)),
+                title: const Text('Use another account', style: TextStyle(fontWeight: FontWeight.bold)),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final customAcc = await showDialog<Map<String, String>>(
+                    context: context,
+                    builder: (dialCtx) {
+                      final nameCtrl = TextEditingController();
+                      final emailCtrl = TextEditingController();
+                      return AlertDialog(
+                        title: const Text('Mock Google Account'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name')),
+                            const SizedBox(height: 12),
+                            TextField(controller: emailCtrl, decoration: const InputDecoration(labelText: 'Email Address')),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(dialCtx), child: const Text('CANCEL')),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (nameCtrl.text.isEmpty || emailCtrl.text.isEmpty) return;
+                              Navigator.pop(dialCtx, {
+                                'name': nameCtrl.text,
+                                'email': emailCtrl.text,
+                                'id': 'google_custom_${DateTime.now().millisecondsSinceEpoch}'
+                              });
+                            },
+                            child: const Text('SIGN IN'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  if (customAcc != null && mounted) {
+                    _loginGoogleUser(customAcc, shopName);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (selectedAccount != null && mounted) {
+      _loginGoogleUser(selectedAccount, shopName);
+    }
+  }
+
+  Future<void> _loginGoogleUser(Map<String, String> account, String shopName) async {
+    setState(() => _loading = true);
+    final success = await ref.read(authNotifierProvider.notifier).loginWithGoogle(
+      email: account['email']!,
+      fullName: account['name']!,
+      googleId: account['id']!,
+      shopName: _selectedRole == 'SHOP_OWNER' ? shopName : null,
+      role: _selectedRole,
+    );
+    if (mounted) {
+      setState(() => _loading = false);
+      if (success) {
+        context.go('/dashboard');
+      } else {
+        final error = ref.read(authNotifierProvider).error ?? 'Google Login failed';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: AppTheme.error),
+        );
+      }
+    }
   }
 
   Widget _field(TextEditingController c, String l, IconData i, String requiredMsg, {TextInputType kb = TextInputType.text, bool obscure = false}) =>
@@ -157,13 +332,13 @@ class _RoleButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected ? AppTheme.primary : tokens.surfaceLow,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppTheme.primary : const Color(0xFF64748B).withOpacity(0.15)),
+          border: Border.all(color: isSelected ? AppTheme.primary : tokens.surfaceBorder),
         ),
         alignment: Alignment.center,
         child: Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: isSelected ? Colors.white : tokens.onSurfaceMuted,
+            color: isSelected ? AppTheme.background : tokens.onSurfaceMuted,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
           ),

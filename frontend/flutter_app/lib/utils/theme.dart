@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 // Export all the new Design System and Theme Foundation files
-export 'theme/app_colors.dart';
 export 'theme/app_typography.dart';
 export 'theme/app_spacing.dart';
 export 'theme/app_radius.dart';
@@ -9,7 +8,6 @@ export 'theme/app_breakpoints.dart';
 export 'theme/app_theme_extension.dart';
 export 'theme/theme.dart';
 
-import 'theme/app_colors.dart';
 import 'theme/theme.dart';
 import 'theme/app_theme_extension.dart';
 

@@ -106,14 +106,14 @@ class _RecordPaymentScreenState extends ConsumerState<RecordPaymentScreen> {
                       decoration: BoxDecoration(
                         color: selected ? AppTheme.primary : tokens.surfaceLow,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: selected ? AppTheme.primary : const Color(0xFFE2E8F0)),
+                        border: Border.all(color: selected ? AppTheme.primary : tokens.surfaceBorder),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(m.$3, size: 18, color: selected ? Colors.black : tokens.onSurfaceMuted),
+                          Icon(m.$3, size: 18, color: selected ? AppTheme.background : tokens.onSurfaceMuted),
                           const SizedBox(width: 8),
-                          Text(m.$2, style: TextStyle(color: selected ? Colors.black : tokens.onSurfaceMuted, fontWeight: FontWeight.bold, fontSize: 13)),
+                          Text(m.$2, style: TextStyle(color: selected ? AppTheme.background : tokens.onSurfaceMuted, fontWeight: FontWeight.bold, fontSize: 13)),
                         ],
                       ),
                     ),

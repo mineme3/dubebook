@@ -228,3 +228,20 @@ class AuditLog(BaseModel):
 class DisputeCreate(BaseModel):
     sessionId: Optional[str] = None
     message: str
+
+# ==================== NEW SCHEMAS FOR OAUTH & RESET ====================
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    email: str
+    code: str
+    newPassword: str
+
+class GoogleAuthRequest(BaseModel):
+    email: str
+    fullName: str
+    googleId: str
+    shopName: Optional[str] = None
+    businessType: Optional[str] = "supermarket"
+    role: str = "SHOP_OWNER"

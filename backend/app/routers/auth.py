@@ -174,3 +174,116 @@ async def update_profile(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+import random
+from datetime import timedelta
+
+@router.post("/forgot-password")
+async def forgot_password(req: schemas.ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == req.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User with this email not found")
+    
+    # Generate 6-digit code
+    code = f"{random.randint(100000, 999999)}"
+    user.passwordResetToken = code
+    user.passwordResetExpires = datetime.utcnow() + timedelta(hours=1)
+    db.commit()
+    
+    # In a real app we'd email it. Here we return it in the response for simulation.
+    return {"message": "Recovery code generated", "code": code}
+
+@router.post("/reset-password")
+async def reset_password(req: schemas.ResetPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == req.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User with this email not found")
+        
+    if not user.passwordResetToken or user.passwordResetToken != req.code:
+        raise HTTPException(status_code=400, detail="Invalid recovery code")
+        
+    if not user.passwordResetExpires or user.passwordResetExpires < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Recovery code has expired")
+        
+    user.passwordHash = get_password_hash(req.newPassword)
+    user.passwordResetToken = None
+    user.passwordResetExpires = None
+    db.commit()
+    
+    return {"success": True, "message": "Password reset successfully"}
+
+@router.post("/google", response_model=schemas.Token)
+async def google_auth(req: schemas.GoogleAuthRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == req.email).first()
+    
+    if user:
+        if not user.isActive:
+            raise HTTPException(status_code=400, detail="Account is deactivated")
+        
+        access_token = create_access_token(data={"sub": user.id})
+        refresh_token = create_refresh_token(db, user.id)
+        return {
+            "token": access_token,
+            "refreshToken": refresh_token,
+            "user": user
+        }
+    else:
+        # Create user
+        base_username = req.email.split('@')[0]
+        username = base_username
+        count = 1
+        while db.query(models.User).filter(models.User.username == username).first():
+            username = f"{base_username}{count}"
+            count += 1
+            
+        phone = f"google_{random.randint(1000000000, 9999999999)}"
+        hashed_password = get_password_hash(f"google_oauth_{random.randint(1000000, 9999999)}")
+        
+        new_user = models.User(
+            username=username,
+            fullName=req.fullName,
+            phone=phone,
+            email=req.email,
+            passwordHash=hashed_password,
+            role=req.role
+        )
+        
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        
+        # Auto-create shop if owner
+        if new_user.role == "SHOP_OWNER":
+            shop_name = req.shopName or f"{req.fullName}'s Shop"
+            shop_slug = services.generate_slug(shop_name)
+            count = 1
+            original_slug = shop_slug
+            while db.query(models.Shop).filter(models.Shop.slug == shop_slug).first():
+                shop_slug = f"{original_slug}-{count}"
+                count += 1
+                
+            invite_code = services.generate_invite_code()
+            while db.query(models.Shop).filter(models.Shop.inviteCode == invite_code).first():
+                invite_code = services.generate_invite_code()
+
+            new_shop = models.Shop(
+                ownerId=new_user.id,
+                name=shop_name,
+                slug=shop_slug,
+                businessType=req.businessType or "supermarket",
+                inviteCode=invite_code
+            )
+            db.add(new_shop)
+            db.commit()
+            db.refresh(new_shop)
+            
+        elif new_user.role == "CUSTOMER":
+            services.link_memberships_to_customer(db, new_user.id, new_user.phone)
+            
+        access_token = create_access_token(data={"sub": new_user.id})
+        refresh_token = create_refresh_token(db, new_user.id)
+        return {
+            "token": access_token,
+            "refreshToken": refresh_token,
+            "user": new_user
+        }
