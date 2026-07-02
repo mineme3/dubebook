@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../utils/theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/components/saas_components.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -36,6 +37,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<DubeTokens>()!;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -51,12 +53,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   const Icon(Icons.shield_outlined, size: 48, color: AppTheme.primary),
                   const SizedBox(height: 24),
-                  Text('DUBEBOOK', style: theme.textTheme.headlineMedium?.copyWith(
+                  Text(l10n.dubebook, style: theme.textTheme.headlineMedium?.copyWith(
                     letterSpacing: 4,
                     fontWeight: FontWeight.w900,
                   )),
                   const SizedBox(height: 4),
-                  Text('SECURE CREDIT MANAGEMENT', style: theme.textTheme.bodySmall?.copyWith(
+                  Text(l10n.secureCreditManagement, style: theme.textTheme.bodySmall?.copyWith(
                     letterSpacing: 2,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
@@ -64,26 +66,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 48),
                   TextField(
                     controller: _identifierController,
-                    decoration: const InputDecoration(labelText: 'Email or Username', prefixIcon: Icon(Icons.person_outline)),
+                    decoration: InputDecoration(labelText: l10n.emailOrUsername, prefixIcon: const Icon(Icons.person_outline)),
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Password', prefixIcon: Icon(Icons.lock_outline)),
+                    decoration: InputDecoration(labelText: l10n.password, prefixIcon: const Icon(Icons.lock_outline)),
                     onSubmitted: (_) => _login(),
                   ),
                   const SizedBox(height: 32),
-                  SaaSButton(label: 'SIGN IN', isLoading: _isLoading, onPressed: _login),
+                  SaaSButton(label: l10n.signIn, isLoading: _isLoading, onPressed: _login),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("New here? ", style: TextStyle(color: tokens.onSurfaceMuted)),
+                      Text(l10n.newHere, style: TextStyle(color: tokens.onSurfaceMuted)),
                       GestureDetector(
                         onTap: () => context.go('/register'),
-                        child: const Text('Create Account', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                        child: Text(l10n.createAccount, style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),

@@ -46,39 +46,39 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     });
   }
 
-  String _friendlyError(Object e) {
+  String _friendlyError(Object e, AppLocalizations l10n) {
     if (e is DioException) {
       final data = e.response?.data;
       if (data is Map<String, dynamic> && data.containsKey('error')) return data['error'] as String;
       if (data is Map<String, dynamic> && data.containsKey('detail')) return data['detail'] as String;
-      return 'Server error';
+      return l10n.serverError;
     }
-    return 'Something went wrong';
+    return l10n.somethingWentWrong;
   }
 
-  void _showAddCustomerDialog() {
-    final username = TextEditingController();
+  void _showAddCustomerDialog(AppLocalizations l10n) {
+    final usernameController = TextEditingController();
     final selectedShop = ref.read(selectedShopProvider);
     if (selectedShop == null) return;
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Register Customer'),
+        title: Text(l10n.registerCustomer),
         content: TextField(
-          controller: username,
-          decoration: const InputDecoration(labelText: 'Username'),
+          controller: usernameController,
+          decoration: InputDecoration(labelText: l10n.username),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           SaaSButton(
-            label: 'Register',
+            label: l10n.register,
             isFullWidth: false,
             onPressed: () async {
-              if (username.text.isEmpty) return;
+              if (usernameController.text.isEmpty) return;
               try {
                 final created = await ref.read(customerNotifierProvider.notifier).addCustomer(
-                      CreateCustomerDto(shopId: selectedShop.id, username: username.text.trim()),
+                      CreateCustomerDto(shopId: selectedShop.id, username: usernameController.text.trim()),
                     );
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
@@ -88,7 +88,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: ${_friendlyError(e)}'), backgroundColor: AppTheme.error),
+                    SnackBar(content: Text('Error: ${_friendlyError(e, l10n)}'), backgroundColor: AppTheme.error),
                   );
                 }
               }
@@ -103,8 +103,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
     final isCustomer = authState.owner?.role == 'CUSTOMER';
+    final l10n = AppLocalizations.of(context)!;
 
-    if (isCustomer) return _buildCustomerPortal(context);
+    if (isCustomer) return _buildCustomerPortal(context, l10n);
 
     final shopsAsync = ref.watch(shopsListProvider);
     final selectedShop = ref.watch(selectedShopProvider);
@@ -125,7 +126,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         title: GestureDetector(
           onTap: () {
             shopsAsync.whenData((shops) {
-              _showShopSelector(context, shops, selectedShop);
+              _showShopSelector(context, shops, selectedShop, l10n);
             });
           },
           child: Row(
@@ -141,8 +142,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(selectedShop?.name ?? 'DubeBook', style: Theme.of(context).textTheme.titleLarge),
-                    Text(selectedShop?.businessType.toUpperCase() ?? 'SaaS PLATFORM', 
+                    Text(selectedShop?.name ?? l10n.appName, style: Theme.of(context).textTheme.titleLarge),
+                    Text(selectedShop?.businessType.toUpperCase() ?? l10n.saasPlafform, 
                          style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10, letterSpacing: 1)),
                   ],
                 ),
@@ -158,10 +159,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           if (shops.isEmpty) {
             return SaaSEmptyState(
               icon: Icons.storefront_outlined,
-              title: 'Create Your Shop',
-              description: 'You need a shop profile to begin registering customers and tracking credits.',
-              actionLabel: 'Create New Shop',
-              onAction: _showCreateShopDialog,
+              title: l10n.createYourShop,
+              description: l10n.createYourShopDesc,
+              actionLabel: l10n.createNewShop,
+              onAction: () => _showCreateShopDialog(l10n),
             );
           }
 
@@ -175,13 +176,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             data: (customers) {
               final filtered = customers.where((c) => 
                 c.fullName.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
-              return _buildRetailerContent(filtered);
+              return _buildRetailerContent(filtered, l10n);
             },
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddCustomerDialog,
+        onPressed: () => _showAddCustomerDialog(l10n),
         backgroundColor: AppTheme.primary,
         foregroundColor: Colors.white,
         child: const Icon(Icons.person_add_outlined),
@@ -189,7 +190,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildRetailerContent(List<Customer> customers) {
+  Widget _buildRetailerContent(List<Customer> customers, AppLocalizations l10n) {
     final totalOutstanding = customers.fold<double>(0, (s, c) => s + c.outstandingBalance);
     final theme = Theme.of(context);
     final tokens = theme.extension<DubeTokens>()!;
@@ -205,8 +206,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                    SaaSStatCard(
-                    label: 'TOTAL OUTSTANDING',
-                    value: '${totalOutstanding.toStringAsFixed(2)} ETB',
+                    label: l10n.totalOutstanding,
+                    value: l10n.etbAmount(totalOutstanding.toStringAsFixed(2)),
                     icon: Icons.account_balance_wallet_rounded,
                     usePrimaryColor: true,
                   ),
@@ -215,7 +216,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     controller: _searchController,
                     onChanged: (v) => setState(() => _searchQuery = v),
                     decoration: InputDecoration(
-                      hintText: 'Search customers...',
+                      hintText: l10n.searchCustomers,
                       prefixIcon: const Icon(Icons.search_rounded),
                       suffixIcon: _searchQuery.isNotEmpty 
                         ? IconButton(icon: const Icon(Icons.clear), onPressed: () {
@@ -226,7 +227,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text('CUSTOMERS', style: theme.textTheme.bodySmall?.copyWith(letterSpacing: 2, fontWeight: FontWeight.bold)),
+                  Text(l10n.customers, style: theme.textTheme.bodySmall?.copyWith(letterSpacing: 2, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -239,7 +240,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   children: [
                     Icon(Icons.people_outline_rounded, size: 64, color: tokens.onSurfaceMuted),
                     const SizedBox(height: 16),
-                    Text('No customers found', style: theme.textTheme.bodyLarge?.copyWith(color: tokens.onSurfaceMuted)),
+                    Text(l10n.noCustomersFoundLower, style: theme.textTheme.bodyLarge?.copyWith(color: tokens.onSurfaceMuted)),
                   ],
                 ),
               ),
@@ -267,7 +268,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(c.fullName, style: theme.textTheme.titleLarge?.copyWith(fontSize: 16)),
-                                  Text(c.isActive ? 'Active Session' : 'No Active Credit', 
+                                  Text(c.isActive ? l10n.activeSession : l10n.noActiveCredit, 
                                        style: theme.textTheme.bodySmall?.copyWith(color: c.isActive ? AppTheme.primary : tokens.onSurfaceMuted)),
                                 ],
                               ),
@@ -275,9 +276,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text('${c.outstandingBalance.toStringAsFixed(2)} ETB', style: theme.textTheme.titleLarge?.copyWith(fontSize: 16)),
+                                Text(l10n.etbAmount(c.outstandingBalance.toStringAsFixed(2)), style: theme.textTheme.titleLarge?.copyWith(fontSize: 16)),
                                 if (c.isOverdue)
-                                  Text('OVERDUE', style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.error, fontWeight: FontWeight.bold)),
+                                  Text(l10n.overdue, style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.error, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ],
@@ -295,7 +296,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildCustomerPortal(BuildContext context) {
+  Widget _buildCustomerPortal(BuildContext context, AppLocalizations l10n) {
     final dashboardAsync = ref.watch(customerDashboardProvider);
     final theme = Theme.of(context);
     final tokens = theme.extension<DubeTokens>()!;
@@ -304,7 +305,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MY PORTAL'),
+        title: Text(l10n.myPortal),
         actions: [
           IconButton(
             icon: Badge(
@@ -333,13 +334,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             padding: const EdgeInsets.all(24),
             children: [
               SaaSStatCard(
-                label: 'TOTAL AGGREGATE DEBT',
-                value: '${data.totalAggregateDebt.toStringAsFixed(2)} ETB',
+                label: l10n.totalAggregateDebt,
+                value: l10n.etbAmount(data.totalAggregateDebt.toStringAsFixed(2)),
                 valueColor: AppTheme.error,
                 icon: Icons.account_balance_outlined,
               ),
               const SizedBox(height: 32),
-              Text('MY CREDIT ACCOUNTS', style: theme.textTheme.bodySmall?.copyWith(letterSpacing: 2, fontWeight: FontWeight.bold)),
+              Text(l10n.myCreditAccounts, style: theme.textTheme.bodySmall?.copyWith(letterSpacing: 2, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               ...data.linkedAccounts.map((acc) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -350,20 +351,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       const Icon(Icons.store_outlined, color: AppTheme.primary),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: Text(acc.shop?.name ?? 'Unknown Shop', style: theme.textTheme.titleLarge?.copyWith(fontSize: 16)),
+                        child: Text(acc.shop?.name ?? l10n.unknownShop, style: theme.textTheme.titleLarge?.copyWith(fontSize: 16)),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (acc.outstandingBalance > 0)
-                            Text('${acc.outstandingBalance.toStringAsFixed(2)} ETB', 
+                            Text(l10n.etbAmount(acc.outstandingBalance.toStringAsFixed(2)), 
                                  style: theme.textTheme.titleLarge?.copyWith(fontSize: 16, color: AppTheme.error))
                           else if (acc.walletBalance > 0)
-                            Text('+${acc.walletBalance.toStringAsFixed(2)} ETB', 
+                            Text('+${l10n.etbAmount(acc.walletBalance.toStringAsFixed(2))}', 
                                  style: theme.textTheme.titleLarge?.copyWith(fontSize: 16, color: AppTheme.primary))
                           else
-                            Text('0.00 ETB', 
+                            Text(l10n.etbAmount('0.00'), 
                                  style: theme.textTheme.titleLarge?.copyWith(fontSize: 16)),
                         ],
                       ),
@@ -378,7 +379,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  void _showShopSelector(BuildContext context, List<Shop> shops, Shop? selectedShop) {
+  void _showShopSelector(BuildContext context, List<Shop> shops, Shop? selectedShop, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surface,
@@ -389,7 +390,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('SWITCH SHOP', style: Theme.of(context).textTheme.bodySmall?.copyWith(letterSpacing: 2, fontWeight: FontWeight.bold)),
+            Text(l10n.switchShop, style: Theme.of(context).textTheme.bodySmall?.copyWith(letterSpacing: 2, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             ...shops.map((s) => ListTile(
               leading: Icon(Icons.storefront_rounded, color: s.id == selectedShop?.id ? AppTheme.primary : null),
@@ -401,9 +402,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               },
             )),
             const SizedBox(height: 16),
-            SaaSButton(label: 'Add New Shop', variant: SaaSButtonVariant.secondary, icon: Icons.add, onPressed: () {
+            SaaSButton(label: l10n.addNewShop, variant: SaaSButtonVariant.secondary, icon: Icons.add, onPressed: () {
               Navigator.pop(context);
-              _showCreateShopDialog();
+              _showCreateShopDialog(l10n);
             }),
           ],
         ),
@@ -411,64 +412,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  void _showCreateShopDialog() {
-    final name = TextEditingController();
-    final type = TextEditingController();
+  void _showCreateShopDialog(AppLocalizations l10n) {
+    final nameController = TextEditingController();
+    final typeController = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Create New Shop'),
+        title: Text(l10n.createNewShop),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: name, decoration: const InputDecoration(labelText: 'Shop Name')),
+            TextField(controller: nameController, decoration: InputDecoration(labelText: l10n.shopNameLabel)),
             const SizedBox(height: 16),
-            TextField(controller: type, decoration: const InputDecoration(labelText: 'Business Type')),
+            TextField(controller: typeController, decoration: InputDecoration(labelText: l10n.businessType)),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           SaaSButton(
-            label: 'Create',
+            label: l10n.create,
             isFullWidth: false,
             onPressed: () async {
-              if (name.text.isEmpty) return;
-              await ref.read(shopsListProvider.notifier).createNewShop(name: name.text.trim(), businessType: type.text);
+              if (nameController.text.isEmpty) return;
+              await ref.read(shopsListProvider.notifier).createNewShop(name: nameController.text.trim(), businessType: typeController.text);
               if (ctx.mounted) Navigator.pop(ctx);
             },
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _QuickAction extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _QuickAction({required this.icon, required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = Theme.of(context).extension<DubeTokens>()!;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: tokens.surfaceLow,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Icon(icon, color: AppTheme.primary),
-          ),
-          const SizedBox(height: 8),
-          Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10, fontWeight: FontWeight.bold)),
         ],
       ),
     );

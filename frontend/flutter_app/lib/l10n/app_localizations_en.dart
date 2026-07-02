@@ -367,4 +367,390 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noTransactions => 'NO TRANSACTIONS RECORDED YET';
+
+  @override
+  String get dubebook => 'DUBEBOOK';
+
+  @override
+  String get secureCreditManagement => 'SECURE CREDIT MANAGEMENT';
+
+  @override
+  String get emailOrUsername => 'Email or Username';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get signIn => 'SIGN IN';
+
+  @override
+  String get newHere => 'New here? ';
+
+  @override
+  String get createAccount => 'Create Account';
+
+  @override
+  String get joinDubebook => 'JOIN DUBEBOOK';
+
+  @override
+  String get startManagingCredit => 'START MANAGING CREDIT SECURELY';
+
+  @override
+  String get retailer => 'RETAILER';
+
+  @override
+  String get customer => 'CUSTOMER';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get emailAddress => 'Email Address';
+
+  @override
+  String get createAccountBtn => 'CREATE ACCOUNT';
+
+  @override
+  String get haveAccount => 'Have an account? ';
+
+  @override
+  String get required => 'Required';
+
+  @override
+  String get myPortal => 'MY PORTAL';
+
+  @override
+  String get totalAggregateDebt => 'TOTAL AGGREGATE DEBT';
+
+  @override
+  String get myCreditAccounts => 'MY CREDIT ACCOUNTS';
+
+  @override
+  String get unknownShop => 'Unknown Shop';
+
+  @override
+  String get customers => 'CUSTOMERS';
+
+  @override
+  String get noCustomersFoundLower => 'No customers found';
+
+  @override
+  String get searchCustomers => 'Search customers...';
+
+  @override
+  String etbAmount(String amount) {
+    return '$amount ETB';
+  }
+
+  @override
+  String get activeSession => 'Active Session';
+
+  @override
+  String get noActiveCredit => 'No Active Credit';
+
+  @override
+  String get createYourShop => 'Create Your Shop';
+
+  @override
+  String get createYourShopDesc =>
+      'You need a shop profile to begin registering customers and tracking credits.';
+
+  @override
+  String get createNewShop => 'Create New Shop';
+
+  @override
+  String get switchShop => 'SWITCH SHOP';
+
+  @override
+  String get addNewShop => 'Add New Shop';
+
+  @override
+  String get businessType => 'Business Type';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get serverError => 'Server error';
+
+  @override
+  String get somethingWentWrong => 'Something went wrong';
+
+  @override
+  String get balance => 'BALANCE';
+
+  @override
+  String get totalDebt => 'TOTAL DEBT';
+
+  @override
+  String get walletBalancePositive => 'WALLET BALANCE (POSITIVE)';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get endDate => 'End Date';
+
+  @override
+  String get timeline => 'TIMELINE';
+
+  @override
+  String get payments => 'PAYMENTS';
+
+  @override
+  String get noPhone => 'NO PHONE';
+
+  @override
+  String get deleteCustomerAndRecords => 'Delete customer and all records?';
+
+  @override
+  String get noDeadline => 'No Deadline';
+
+  @override
+  String get paid => 'PAID';
+
+  @override
+  String get active => 'ACTIVE';
+
+  @override
+  String get paymentReceived => 'Payment Received';
+
+  @override
+  String remaining(String amount) {
+    return 'REMAINING: $amount ETB';
+  }
+
+  @override
+  String get addItem => 'Add Item';
+
+  @override
+  String get addNew => 'Add New';
+
+  @override
+  String get pay => 'Pay';
+
+  @override
+  String get sessionLimitWarning =>
+      'A customer can have at most 2 active sessions. Settle a session to open a new one.';
+
+  @override
+  String get noCreditMatchesFilters => 'No credit history matches filters';
+
+  @override
+  String get noPaymentsMatchesFilters =>
+      'No payments recorded matching filters';
+
+  @override
+  String get deleteItem => 'Delete Item';
+
+  @override
+  String get deleteItemConfirm =>
+      'Are you sure you want to delete this item? Customer balance will be updated.';
+
+  @override
+  String get editItem => 'Edit Item';
+
+  @override
+  String get itemName => 'Item Name';
+
+  @override
+  String get byKg => 'By KG';
+
+  @override
+  String get byQuantity => 'By Quantity';
+
+  @override
+  String get weightKg => 'Weight (KG)';
+
+  @override
+  String get quantity => 'Quantity';
+
+  @override
+  String get pricePerKg => 'Price per KG';
+
+  @override
+  String get pricePerItem => 'Price per Item';
+
+  @override
+  String get pricePerKgEtb => 'Price per KG (ETB)';
+
+  @override
+  String get pricePerItemEtb => 'Price per Item (ETB)';
+
+  @override
+  String totalAmount(String amount) {
+    return 'Total: $amount ETB';
+  }
+
+  @override
+  String itemTotalAmount(String amount) {
+    return 'Item Total: $amount ETB';
+  }
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get addToBasket => 'Add to Basket';
+
+  @override
+  String get addItemToSession => 'Add Item to Session';
+
+  @override
+  String get raiseDispute => 'Raise a Dispute';
+
+  @override
+  String get complaintMessage => 'Complaint Message';
+
+  @override
+  String get complaintHint =>
+      'Enter why you think this session amount is incorrect...';
+
+  @override
+  String get submitDispute => 'Submit Dispute';
+
+  @override
+  String get disputeSubmitted =>
+      'Dispute submitted successfully to shop owner.';
+
+  @override
+  String get dispute => 'Dispute';
+
+  @override
+  String get updateDeadline => 'Update Deadline';
+
+  @override
+  String get cancelSession => 'Cancel Session';
+
+  @override
+  String get cancelSessionConfirm =>
+      'This session will be marked as cancelled. This cannot be undone.';
+
+  @override
+  String get selectDate => 'Select Date';
+
+  @override
+  String get newCreditSession => 'NEW CREDIT SESSION';
+
+  @override
+  String get basketItems => 'BASKET ITEMS';
+
+  @override
+  String get deadlineOptional => 'DEADLINE (OPTIONAL)';
+
+  @override
+  String get selectDeadlineDate => 'Select Deadline Date';
+
+  @override
+  String get total => 'TOTAL';
+
+  @override
+  String get saveSession => 'SAVE SESSION';
+
+  @override
+  String get recordPayment => 'RECORD PAYMENT';
+
+  @override
+  String get paymentAmountEtb => 'Payment Amount (ETB)';
+
+  @override
+  String get paymentMethod => 'PAYMENT METHOD';
+
+  @override
+  String get cash => 'Cash';
+
+  @override
+  String get mobileMoney => 'Mobile Money';
+
+  @override
+  String get bankTransfer => 'Bank Transfer';
+
+  @override
+  String get other => 'Other';
+
+  @override
+  String get noteOptional => 'Note (optional)';
+
+  @override
+  String get confirmPayment => 'CONFIRM PAYMENT';
+
+  @override
+  String get mustBeGreaterThanZero => 'Must be > 0';
+
+  @override
+  String get alerts => 'ALERTS';
+
+  @override
+  String get markAllAsRead => 'Mark all as read';
+
+  @override
+  String get clearReadNotifications => 'Clear read notifications';
+
+  @override
+  String get allNotificationsRead => 'All notifications marked as read';
+
+  @override
+  String get readNotificationsCleared => 'Read notifications cleared';
+
+  @override
+  String get allClear => 'All clear';
+
+  @override
+  String get noAlertsDescription =>
+      'You have no alerts or notifications at this time.';
+
+  @override
+  String get alert => 'Alert';
+
+  @override
+  String get saasPlafform => 'SaaS PLATFORM';
+
+  @override
+  String due(String date) {
+    return 'DUE $date';
+  }
+
+  @override
+  String get account => 'ACCOUNT';
+
+  @override
+  String get shopDetails => 'SHOP DETAILS';
+
+  @override
+  String get editShopDetails => 'Edit Shop Details';
+
+  @override
+  String get preferences => 'PREFERENCES';
+
+  @override
+  String get dangerZone => 'DANGER ZONE';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get editShop => 'Edit Shop';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String updateProfileFailed(String error) {
+    return 'Failed to update profile: $error';
+  }
 }

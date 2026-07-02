@@ -18,6 +18,7 @@ import '../features/notifications/screens/notification_log_screen.dart';
 import '../utils/theme.dart';
 import '../utils/ethiopian_date_picker.dart';
 import '../utils/ethiopian_calendar.dart';
+import '../l10n/app_localizations.dart';
 
 class CustomerDetailScreen extends ConsumerStatefulWidget {
   final String customerId;
@@ -38,28 +39,29 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
     _tabController = TabController(length: 2, vsync: this);
   }
 
-  String _friendlyError(Object e) {
+  String _friendlyError(Object e, AppLocalizations l10n) {
     if (e is DioException) {
       final data = e.response?.data;
       if (data is Map<String, dynamic> && data.containsKey('error')) return data['error'] as String;
-      return 'Server error';
+      return l10n.serverError;
     }
-    return 'Something went wrong';
+    return l10n.somethingWentWrong;
   }
 
   @override
   Widget build(BuildContext context) {
     final summaryAsync = ref.watch(customerSummaryProvider(widget.customerId));
     final tokens = Theme.of(context).extension<DubeTokens>()!;
+    final l10n = AppLocalizations.of(context)!;
 
     return summaryAsync.when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(body: Center(child: Text('Error: $e'))),
-      data: (summary) => _buildScaffold(summary, tokens),
+      data: (summary) => _buildScaffold(summary, tokens, l10n),
     );
   }
 
-  Widget _buildScaffold(CustomerSummary summary, DubeTokens tokens) {
+  Widget _buildScaffold(CustomerSummary summary, DubeTokens tokens, AppLocalizations l10n) {
     final c = summary.customer;
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
@@ -74,7 +76,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(child:Text(c.fullName.toUpperCase(), style: theme.textTheme.titleLarge?.copyWith(fontSize: 16))),
-            Center(child:Text(c.phone.isNotEmpty ? c.phone : 'NO PHONE', style: theme.textTheme.bodySmall?.copyWith(fontSize: 11))),
+            Center(child:Text(c.phone.isNotEmpty ? c.phone : l10n.noPhone, style: theme.textTheme.bodySmall?.copyWith(fontSize: 11))),
           ],
         ),
         actions: [
@@ -82,7 +84,14 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
             IconButton(
               icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.error),
               onPressed: () async {
-                final ok = await showConfirmDialog(context: context, title: 'Delete Customer', message: 'Delete customer and all records?', isDestructive: true);
+                final ok = await showConfirmDialog(
+                  context: context, 
+                  title: l10n.deleteCustomer, 
+                  message: l10n.deleteCustomerAndRecords, 
+                  confirmText: l10n.delete,
+                  cancelText: l10n.cancel,
+                  isDestructive: true
+                );
                 if (ok) {
                   await ref.read(customerNotifierProvider.notifier).deleteCustomer(widget.customerId);
                   if (mounted) context.go('/dashboard');
@@ -117,24 +126,24 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
                 SizedBox(
                   width: (MediaQuery.of(context).size.width - 60) / 2,
                   child: SaaSStatCard(
-                    label: 'BALANCE', 
-                    value: '${c.outstandingBalance.toStringAsFixed(0)} ETB', 
+                    label: l10n.balance, 
+                    value: l10n.etbAmount(c.outstandingBalance.toStringAsFixed(0)), 
                     valueColor: c.isOverdue ? AppTheme.error : AppTheme.primary
                   ),
                 ),
                 SizedBox(
                   width: (MediaQuery.of(context).size.width - 60) / 2,
                   child: SaaSStatCard(
-                    label: 'TOTAL DEBT', 
-                    value: '${c.totalDebt.toStringAsFixed(0)} ETB'
+                    label: l10n.totalDebt, 
+                    value: l10n.etbAmount(c.totalDebt.toStringAsFixed(0))
                   ),
                 ),
                 if (c.walletBalance > 0)
                   SizedBox(
                     width: MediaQuery.of(context).size.width - 48,
                     child: SaaSStatCard(
-                      label: 'WALLET BALANCE (POSITIVE)', 
-                      value: '${c.walletBalance.toStringAsFixed(0)} ETB',
+                      label: l10n.walletBalancePositive, 
+                      value: l10n.etbAmount(c.walletBalance.toStringAsFixed(0)),
                       valueColor: AppTheme.primary,
                       icon: Icons.account_balance_wallet_outlined,
                     ),
@@ -151,7 +160,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
                 TextButton.icon(
                   icon: const Icon(Icons.date_range, size: 16),
                   label: Text(_fromDate == null 
-                    ? 'Start Date' 
+                    ? l10n.startDate 
                     : DateFormat('MM/dd/yyyy').format(_fromDate!)),
                   onPressed: () async {
                     final picked = await showDatePicker(
@@ -168,7 +177,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
                 TextButton.icon(
                   icon: const Icon(Icons.date_range, size: 16),
                   label: Text(_toDate == null 
-                    ? 'End Date' 
+                    ? l10n.endDate 
                     : DateFormat('MM/dd/yyyy').format(_toDate!)),
                   onPressed: () async {
                     final picked = await showDatePicker(
@@ -212,7 +221,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
               labelColor: Colors.white,
               unselectedLabelColor: tokens.onSurfaceMuted,
               labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-              tabs: const [Tab(text: 'TIMELINE'), Tab(text: 'PAYMENTS')],
+              tabs: [Tab(text: l10n.timeline), Tab(text: l10n.payments)],
             ),
           ),
           const SizedBox(height: 16),
@@ -220,18 +229,18 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildTimelineTab(summary.sessions, isCustomer),
-                _buildPaymentsTab(summary.paymentHistory),
+                _buildTimelineTab(summary.sessions, isCustomer, l10n),
+                _buildPaymentsTab(summary.paymentHistory, l10n),
               ],
             ),
           ),
-          if (!isCustomer) _buildActionFooter(c, summary.sessions),
+          if (!isCustomer) _buildActionFooter(c, summary.sessions, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildTimelineTab(List<CreditSession> sessions, bool isCustomer) {
+  Widget _buildTimelineTab(List<CreditSession> sessions, bool isCustomer, AppLocalizations l10n) {
     var filtered = [...sessions]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     if (_fromDate != null) {
       filtered = filtered.where((s) => s.createdAt.isAfter(_fromDate!)).toList();
@@ -239,7 +248,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
     if (_toDate != null) {
       filtered = filtered.where((s) => s.createdAt.isBefore(_toDate!.add(const Duration(days: 1)))).toList();
     }
-    if (filtered.isEmpty) return const Center(child: Text('No credit history matches filters'));
+    if (filtered.isEmpty) return Center(child: Text(l10n.noCreditMatchesFilters));
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       itemCount: filtered.length,
@@ -247,7 +256,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
     );
   }
 
-  Widget _buildPaymentsTab(List<PaymentRecord> payments) {
+  Widget _buildPaymentsTab(List<PaymentRecord> payments, AppLocalizations l10n) {
     var filtered = [...payments]..sort((a, b) => b.paidAt.compareTo(a.paidAt));
     if (_fromDate != null) {
       filtered = filtered.where((p) => p.paidAt.isAfter(_fromDate!)).toList();
@@ -255,7 +264,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
     if (_toDate != null) {
       filtered = filtered.where((p) => p.paidAt.isBefore(_toDate!.add(const Duration(days: 1)))).toList();
     }
-    if (filtered.isEmpty) return const Center(child: Text('No payments recorded matching filters'));
+    if (filtered.isEmpty) return Center(child: Text(l10n.noPaymentsMatchesFilters));
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       itemCount: filtered.length,
@@ -272,12 +281,12 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Payment Received', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16)),
+                      Text(l10n.paymentReceived, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16)),
                       Text(DateFormat('MMM dd, yyyy • hh:mm a').format(p.paidAt.toLocal()), style: Theme.of(context).textTheme.bodySmall),
                     ],
                   ),
                 ),
-                Text('+${p.amountPaid.toStringAsFixed(0)} ETB', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16, color: AppTheme.primary)),
+                Text('+${l10n.etbAmount(p.amountPaid.toStringAsFixed(0))}', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16, color: AppTheme.primary)),
               ],
             ),
           ),
@@ -286,7 +295,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
     );
   }
 
-  Widget _buildActionFooter(Customer c, List<CreditSession> sessions) {
+  Widget _buildActionFooter(Customer c, List<CreditSession> sessions, AppLocalizations l10n) {
     final activeSessionsCount = sessions.where((s) => !s.isPaid).length;
     final blocked = _sessionLimitHit && activeSessionsCount >= 2;
 
@@ -315,8 +324,8 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'A customer can have at most 2 active sessions. Settle a session to open a new one.',
-                      style: TextStyle(color: AppTheme.error, fontSize: 12, fontWeight: FontWeight.bold),
+                      l10n.sessionLimitWarning,
+                      style: const TextStyle(color: AppTheme.error, fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -330,16 +339,16 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
               children: [
                 Expanded(
                   child: SaaSButton(
-                    label: 'Add New',
+                    label: l10n.addNew,
                     icon: Icons.add_circle_outline,
                     variant: blocked ? SaaSButtonVariant.ghost : SaaSButtonVariant.secondary,
-                    onPressed: blocked ? null : () => _createNewSession(activeSessionsCount),
+                    onPressed: blocked ? null : () => _createNewSession(activeSessionsCount, l10n),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: SaaSButton(
-                    label: 'Pay',
+                    label: l10n.pay,
                     icon: Icons.payment,
                     onPressed: c.outstandingBalance > 0
                         ? () => context.push(
@@ -357,7 +366,7 @@ class _CustomerDetailScreenState extends ConsumerState<CustomerDetailScreen> wit
     );
   }
 
-  Future<void> _createNewSession(int activeSessionsCount) async {
+  Future<void> _createNewSession(int activeSessionsCount, AppLocalizations l10n) async {
     if (activeSessionsCount >= 2) {
       setState(() => _sessionLimitHit = true);
       return;
@@ -391,7 +400,8 @@ class _FinancialTimelineItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final tokens = theme.extension<DubeTokens>()!;
-    final deadlineStr = session.deadline != null ? DateFormat('MMM dd, yyyy').format(session.deadline!.toLocal()) : 'No Deadline';
+    final l10n = AppLocalizations.of(context)!;
+    final deadlineStr = session.deadline != null ? DateFormat('MMM dd, yyyy').format(session.deadline!.toLocal()) : l10n.noDeadline;
 
     return IntrinsicHeight(
       child: Row(
@@ -414,7 +424,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: GestureDetector(
-                onLongPress: isCustomer ? null : () => _showSessionActions(context, ref),
+                onLongPress: isCustomer ? null : () => _showSessionActions(context, ref, l10n),
                 child: SaaSCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,16 +436,16 @@ class _FinancialTimelineItem extends ConsumerWidget {
                           Row(
                             children: [
                               if (isCustomer && !session.isPaid)
-                                TextButton.icon(
-                                  icon: const Icon(Icons.warning_amber_rounded, size: 14, color: AppTheme.error),
-                                  label: const Text('Dispute', style: TextStyle(color: AppTheme.error, fontSize: 10)),
-                                  onPressed: () => _showDisputeDialog(context, ref),
-                                ),
+                                  TextButton.icon(
+                                    icon: const Icon(Icons.warning_amber_rounded, size: 14, color: AppTheme.error),
+                                    label: Text(l10n.dispute, style: const TextStyle(color: AppTheme.error, fontSize: 10)),
+                                    onPressed: () => _showDisputeDialog(context, ref, l10n),
+                                  ),
                               const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(color: session.isPaid ? tokens.successMuted : (session.isOverdue ? AppTheme.error.withOpacity(0.1) : tokens.surfaceHigh), borderRadius: BorderRadius.circular(8)),
-                                child: Text(session.isPaid ? 'PAID' : (session.isOverdue ? 'OVERDUE' : 'ACTIVE'), style: theme.textTheme.bodySmall?.copyWith(fontSize: 9, color: session.isPaid ? AppTheme.primary : (session.isOverdue ? AppTheme.error : tokens.onSurfaceMuted), fontWeight: FontWeight.bold)),
+                                child: Text(session.isPaid ? l10n.paid : (session.isOverdue ? l10n.overdue : l10n.active), style: theme.textTheme.bodySmall?.copyWith(fontSize: 9, color: session.isPaid ? AppTheme.primary : (session.isOverdue ? AppTheme.error : tokens.onSurfaceMuted), fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),
@@ -459,19 +469,19 @@ class _FinancialTimelineItem extends ConsumerWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('${item.totalPrice.toStringAsFixed(0)} ETB', style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
+                                Text(l10n.etbAmount(item.totalPrice.toStringAsFixed(0)), style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
                                 if (!isCustomer && !session.isPaid) ...[
                                   IconButton(
                                     icon: const Icon(Icons.edit_outlined, size: 16),
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
-                                    onPressed: () => _showEditItemDialog(context, ref, item),
+                                    onPressed: () => _showEditItemDialog(context, ref, item, l10n),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppTheme.error),
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
-                                    onPressed: () => _deleteItem(context, ref, item.id),
+                                    onPressed: () => _deleteItem(context, ref, item.id, l10n),
                                   ),
                                 ],
                               ],
@@ -486,21 +496,21 @@ class _FinancialTimelineItem extends ConsumerWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('DUE $deadlineStr', style: theme.textTheme.bodySmall?.copyWith(color: session.isOverdue ? AppTheme.error : tokens.onSurfaceMuted, fontWeight: FontWeight.bold)),
+                              Text('${l10n.dueDate(deadlineStr)}', style: theme.textTheme.bodySmall?.copyWith(color: session.isOverdue ? AppTheme.error : tokens.onSurfaceMuted, fontWeight: FontWeight.bold)),
                               if (!session.isPaid && session.outstandingBalance < session.totalAmount)
-                                Text('REMAINING: ${session.outstandingBalance.toStringAsFixed(0)} ETB', style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.primary, fontSize: 10)),
+                                Text(l10n.remaining(session.outstandingBalance.toStringAsFixed(0)), style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.primary, fontSize: 10)),
                             ],
                           ),
-                          Text('${session.totalAmount.toStringAsFixed(0)} ETB', style: theme.textTheme.titleLarge?.copyWith(color: AppTheme.primary)),
+                          Text(l10n.etbAmount(session.totalAmount.toStringAsFixed(0)), style: theme.textTheme.titleLarge?.copyWith(color: AppTheme.primary)),
                         ],
                       ),
                       if (!isCustomer && !session.isPaid) ...[
                         const SizedBox(height: 16),
                         SaaSButton(
-                          label: 'Add Item',
+                          label: l10n.addItem,
                           variant: SaaSButtonVariant.secondary,
                           icon: Icons.add,
-                          onPressed: () => _showAddItemDialog(context, ref),
+                          onPressed: () => _showAddItemDialog(context, ref, l10n),
                         ),
                       ],
                     ],
@@ -514,11 +524,13 @@ class _FinancialTimelineItem extends ConsumerWidget {
     );
   }
 
-  Future<void> _deleteItem(BuildContext context, WidgetRef ref, String itemId) async {
+  Future<void> _deleteItem(BuildContext context, WidgetRef ref, String itemId, AppLocalizations l10n) async {
     final ok = await showConfirmDialog(
       context: context,
-      title: 'Delete Item',
-      message: 'Are you sure you want to delete this item? Customer balance will be updated.',
+      title: l10n.deleteItem,
+      message: l10n.deleteItemConfirm,
+      confirmText: l10n.delete,
+      cancelText: l10n.cancel,
       isDestructive: true,
     );
     if (!ok) return;
@@ -537,7 +549,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
     }
   }
 
-  void _showEditItemDialog(BuildContext context, WidgetRef ref, CreditItem item) {
+  void _showEditItemDialog(BuildContext context, WidgetRef ref, CreditItem item, AppLocalizations l10n) {
     final itemName = TextEditingController(text: item.itemName);
     final qty = TextEditingController(text: item.quantity.toStringAsFixed(0));
     final price = TextEditingController(text: item.unitPrice.toStringAsFixed(0));
@@ -553,7 +565,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
             final itemTotal = q * p;
 
             return AlertDialog(
-              title: const Text('Edit Item'),
+              title: Text(l10n.editItem),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -562,9 +574,9 @@ class _FinancialTimelineItem extends ConsumerWidget {
                     TextField(
                       controller: itemName,
                       textCapitalization: TextCapitalization.sentences,
-                      decoration: const InputDecoration(
-                        labelText: 'Item Name',
-                        prefixIcon: Icon(Icons.shopping_bag_outlined),
+                      decoration: InputDecoration(
+                        labelText: l10n.itemName,
+                        prefixIcon: const Icon(Icons.shopping_bag_outlined),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -572,7 +584,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: ChoiceChip(
-                            label: const Center(child: Text('By KG')),
+                            label: Center(child: Text(l10n.byKg)),
                             selected: isKg,
                             onSelected: (val) {
                               if (val) {
@@ -586,7 +598,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: ChoiceChip(
-                            label: const Center(child: Text('By Quantity')),
+                            label: Center(child: Text(l10n.byQuantity)),
                             selected: !isKg,
                             onSelected: (val) {
                               if (val) {
@@ -607,7 +619,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                             controller: qty,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             decoration: InputDecoration(
-                              labelText: isKg ? 'Weight (KG)' : 'Quantity',
+                              labelText: isKg ? l10n.weightKg : l10n.quantity,
                               prefixIcon: Icon(isKg ? Icons.scale_outlined : Icons.numbers_outlined),
                             ),
                             onChanged: (_) => setState(() {}),
@@ -619,7 +631,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                             controller: price,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             decoration: InputDecoration(
-                              labelText: isKg ? 'Price per KG' : 'Price per Item',
+                              labelText: isKg ? l10n.pricePerKg : l10n.pricePerItem,
                               prefixIcon: const Icon(Icons.payments_outlined),
                             ),
                             onChanged: (_) => setState(() {}),
@@ -631,7 +643,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                       const SizedBox(height: 16),
                       Center(
                         child: Text(
-                          'Total: ${itemTotal.toStringAsFixed(0)} ETB',
+                          l10n.totalAmount(itemTotal.toStringAsFixed(0)),
                           style: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.bold,
@@ -646,10 +658,10 @@ class _FinancialTimelineItem extends ConsumerWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                 ),
                 SaaSButton(
-                  label: 'Save Changes',
+                  label: l10n.saveChanges,
                   isFullWidth: false,
                   onPressed: () async {
                     if (itemName.text.isEmpty || price.text.isEmpty) return;
@@ -684,27 +696,27 @@ class _FinancialTimelineItem extends ConsumerWidget {
     );
   }
 
-  void _showDisputeDialog(BuildContext context, WidgetRef ref) {
+  void _showDisputeDialog(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
     final complaintController = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Raise a Dispute'),
+        title: Text(l10n.raiseDispute),
         content: TextField(
           controller: complaintController,
           maxLines: 3,
-          decoration: const InputDecoration(
-            labelText: 'Complaint Message',
-            hintText: 'Enter why you think this session amount is incorrect...',
+          decoration: InputDecoration(
+            labelText: l10n.complaintMessage,
+            hintText: l10n.complaintHint,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           SaaSButton(
-            label: 'Submit Dispute',
+            label: l10n.submitDispute,
             isFullWidth: false,
             onPressed: () async {
               if (complaintController.text.trim().isEmpty) return;
@@ -721,7 +733,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                 if (ctx.mounted) {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Dispute submitted successfully to shop owner.')),
+                    SnackBar(content: Text(l10n.disputeSubmitted)),
                   );
                 }
               } catch (e) {
@@ -736,7 +748,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
     );
   }
 
-  void _showSessionActions(BuildContext context, WidgetRef ref) {
+  void _showSessionActions(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
@@ -746,7 +758,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.edit_calendar_outlined),
-              title: const Text('Update Deadline'),
+              title: Text(l10n.updateDeadline),
               onTap: () {
                 Navigator.pop(ctx);
                 _updateDeadline(context, ref);
@@ -754,10 +766,10 @@ class _FinancialTimelineItem extends ConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.cancel_outlined, color: AppTheme.error),
-              title: const Text('Cancel Session', style: TextStyle(color: AppTheme.error)),
+              title: Text(l10n.cancelSession, style: const TextStyle(color: AppTheme.error)),
               onTap: () {
                 Navigator.pop(ctx);
-                _cancelSession(context, ref);
+                _cancelSession(context, ref, l10n);
               },
             ),
           ],
@@ -789,11 +801,13 @@ class _FinancialTimelineItem extends ConsumerWidget {
     }
   }
 
-  Future<void> _cancelSession(BuildContext context, WidgetRef ref) async {
+  Future<void> _cancelSession(BuildContext context, WidgetRef ref, AppLocalizations l10n) async {
     final ok = await showConfirmDialog(
       context: context,
-      title: 'Cancel Session',
-      message: 'This session will be marked as cancelled. This cannot be undone.',
+      title: l10n.cancelSession,
+      message: l10n.cancelSessionConfirm,
+      confirmText: l10n.confirm,
+      cancelText: l10n.cancel,
       isDestructive: true,
     );
     if (!ok) return;
@@ -808,7 +822,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
     }
   }
 
-  void _showAddItemDialog(BuildContext context, WidgetRef ref) {
+  void _showAddItemDialog(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
     final itemName = TextEditingController();
     final qty = TextEditingController(text: '1');
     final price = TextEditingController();
@@ -824,7 +838,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
             final itemTotal = q * p;
 
             return AlertDialog(
-              title: const Text('Add Item to Session'),
+              title: Text(l10n.addItemToSession),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -833,9 +847,9 @@ class _FinancialTimelineItem extends ConsumerWidget {
                     TextField(
                       controller: itemName,
                       textCapitalization: TextCapitalization.sentences,
-                      decoration: const InputDecoration(
-                        labelText: 'Item Name',
-                        prefixIcon: Icon(Icons.shopping_bag_outlined),
+                      decoration: InputDecoration(
+                        labelText: l10n.itemName,
+                        prefixIcon: const Icon(Icons.shopping_bag_outlined),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -843,7 +857,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: ChoiceChip(
-                            label: const Center(child: Text('By KG')),
+                            label: Center(child: Text(l10n.byKg)),
                             selected: isKg,
                             onSelected: (val) {
                               if (val) {
@@ -857,7 +871,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: ChoiceChip(
-                            label: const Center(child: Text('By Quantity')),
+                            label: Center(child: Text(l10n.byQuantity)),
                             selected: !isKg,
                             onSelected: (val) {
                               if (val) {
@@ -878,7 +892,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                             controller: qty,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             decoration: InputDecoration(
-                              labelText: isKg ? 'Weight (KG)' : 'Quantity',
+                              labelText: isKg ? l10n.weightKg : l10n.quantity,
                               prefixIcon: Icon(isKg ? Icons.scale_outlined : Icons.numbers_outlined),
                             ),
                             onChanged: (_) => setState(() {}),
@@ -890,7 +904,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                             controller: price,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             decoration: InputDecoration(
-                              labelText: isKg ? 'Price per KG' : 'Price per Item',
+                              labelText: isKg ? l10n.pricePerKg : l10n.pricePerItem,
                               prefixIcon: const Icon(Icons.payments_outlined),
                             ),
                             onChanged: (_) => setState(() {}),
@@ -902,7 +916,7 @@ class _FinancialTimelineItem extends ConsumerWidget {
                       const SizedBox(height: 16),
                       Center(
                         child: Text(
-                          'Total: ${itemTotal.toStringAsFixed(0)} ETB',
+                          l10n.totalAmount(itemTotal.toStringAsFixed(0)),
                           style: TextStyle(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.bold,
@@ -917,10 +931,10 @@ class _FinancialTimelineItem extends ConsumerWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                 ),
                 SaaSButton(
-                  label: 'Add Item',
+                  label: l10n.addItem,
                   isFullWidth: false,
                   onPressed: () async {
                     if (itemName.text.isEmpty || price.text.isEmpty) return;

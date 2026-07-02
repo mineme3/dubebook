@@ -5,6 +5,7 @@ import '../../../utils/theme.dart';
 import '../../../core/models/payment_record.dart';
 import '../providers/payment_provider.dart';
 import '../../../shared/widgets/components/saas_components.dart';
+import '../../../l10n/app_localizations.dart';
 
 class RecordPaymentScreen extends ConsumerStatefulWidget {
   final String customerId;
@@ -20,13 +21,6 @@ class _RecordPaymentScreenState extends ConsumerState<RecordPaymentScreen> {
   final _note = TextEditingController();
   String _method = 'cash';
   bool _saving = false;
-
-  static const _methods = [
-    ('cash', 'Cash', Icons.money_outlined),
-    ('mobile_money', 'Mobile Money', Icons.phone_android_outlined),
-    ('bank_transfer', 'Bank Transfer', Icons.account_balance_outlined),
-    ('other', 'Other', Icons.more_horiz_outlined),
-  ];
 
   double get _projectedAfter {
     final paid = double.tryParse(_amount.text) ?? 0;
@@ -57,9 +51,17 @@ class _RecordPaymentScreenState extends ConsumerState<RecordPaymentScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final tokens = theme.extension<DubeTokens>()!;
+    final l10n = AppLocalizations.of(context)!;
+
+    final methods = [
+      ('cash', l10n.cash, Icons.money_outlined),
+      ('mobile_money', l10n.mobileMoney, Icons.phone_android_outlined),
+      ('bank_transfer', l10n.bankTransfer, Icons.account_balance_outlined),
+      ('other', l10n.other, Icons.more_horiz_outlined),
+    ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('RECORD PAYMENT')),
+      appBar: AppBar(title: Text(l10n.recordPayment.toUpperCase())),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -68,8 +70,8 @@ class _RecordPaymentScreenState extends ConsumerState<RecordPaymentScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SaaSStatCard(
-                label: 'OUTSTANDING BALANCE', 
-                value: '${widget.outstandingBalance.toStringAsFixed(0)} ETB',
+                label: l10n.outstandingBalance, 
+                value: l10n.etbAmount(widget.outstandingBalance.toStringAsFixed(0)),
                 icon: Icons.account_balance_wallet_outlined,
               ),
               const SizedBox(height: 32),
@@ -79,22 +81,22 @@ class _RecordPaymentScreenState extends ConsumerState<RecordPaymentScreen> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 style: theme.textTheme.displayLarge?.copyWith(fontSize: 32),
                 textAlign: TextAlign.center,
-                decoration: const InputDecoration(labelText: 'Payment Amount (ETB)', prefixIcon: Icon(Icons.payments_outlined)),
+                decoration: InputDecoration(labelText: l10n.paymentAmountEtb, prefixIcon: const Icon(Icons.payments_outlined)),
                 onChanged: (_) => setState(() {}),
                 validator: (v) {
-                  if (v == null || v.isEmpty) return 'Required';
+                  if (v == null || v.isEmpty) return l10n.required;
                   final n = double.tryParse(v);
-                  if (n == null || n <= 0) return 'Must be > 0';
+                  if (n == null || n <= 0) return l10n.mustBeGreaterThanZero;
                   return null;
                 },
               ),
               const SizedBox(height: 32),
-              Text('PAYMENT METHOD', style: theme.textTheme.bodySmall?.copyWith(letterSpacing: 1.5, fontWeight: FontWeight.bold)),
+              Text(l10n.paymentMethod, style: theme.textTheme.bodySmall?.copyWith(letterSpacing: 1.5, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: _methods.map((m) {
+                children: methods.map((m) {
                   final selected = _method == m.$1;
                   return GestureDetector(
                     onTap: () => setState(() => _method = m.$1),
@@ -122,10 +124,10 @@ class _RecordPaymentScreenState extends ConsumerState<RecordPaymentScreen> {
               TextFormField(
                 controller: _note,
                 maxLines: 2,
-                decoration: const InputDecoration(labelText: 'Note (optional)', prefixIcon: Icon(Icons.note_outlined)),
+                decoration: InputDecoration(labelText: l10n.noteOptional, prefixIcon: const Icon(Icons.note_outlined)),
               ),
               const SizedBox(height: 48),
-              SaaSButton(label: 'CONFIRM PAYMENT', isLoading: _saving, icon: Icons.check_circle_outline, onPressed: _save),
+              SaaSButton(label: l10n.confirmPayment, isLoading: _saving, icon: Icons.check_circle_outline, onPressed: _save),
             ],
           ),
         ),

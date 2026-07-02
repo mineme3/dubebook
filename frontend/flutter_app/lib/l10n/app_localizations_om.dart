@@ -367,4 +367,393 @@ class AppLocalizationsOm extends AppLocalizations {
 
   @override
   String get noTransactions => 'GIBIYYANNAAN TOKKOLLEE HIN GALMEESSINE';
+
+  @override
+  String get dubebook => 'DUBEBOOK';
+
+  @override
+  String get secureCreditManagement => 'BULCHIINSA LIQII NAGEENYA';
+
+  @override
+  String get emailOrUsername => 'Imeelii ykn Maqaa Fayyadamaa';
+
+  @override
+  String get password => 'Jecha Darbii';
+
+  @override
+  String get signIn => 'SEENI';
+
+  @override
+  String get newHere => 'Haaraa? ';
+
+  @override
+  String get createAccount => 'Herrega Uumi';
+
+  @override
+  String get joinDubebook => 'DUBEBOOK MAKKAMI';
+
+  @override
+  String get startManagingCredit => 'LIQII NAGAAN BULCHUU JALQABI';
+
+  @override
+  String get retailer => 'DALDAALTUU';
+
+  @override
+  String get customer => 'MAAMILA';
+
+  @override
+  String get username => 'Maqaa Fayyadamaa';
+
+  @override
+  String get phoneNumber => 'Lakk. Bilbilaa';
+
+  @override
+  String get emailAddress => 'Teessoo Imeelii';
+
+  @override
+  String get createAccountBtn => 'HERREGA UUMI';
+
+  @override
+  String get haveAccount => 'Herrega qabdaa? ';
+
+  @override
+  String get required => 'Barbaachisaadha';
+
+  @override
+  String get myPortal => 'PORTAL KOO';
+
+  @override
+  String get totalAggregateDebt => 'WALIIGALA LIQII DABALAME';
+
+  @override
+  String get myCreditAccounts => 'HERREGAA LIQII KOO';
+
+  @override
+  String get unknownShop => 'Suuqii Hin Beekamne';
+
+  @override
+  String get customers => 'MAAMILOOTA';
+
+  @override
+  String get noCustomersFoundLower => 'Maamilni hin argamne';
+
+  @override
+  String get searchCustomers => 'Maamila barbaadi...';
+
+  @override
+  String etbAmount(String amount) {
+    return '$amount Birrii';
+  }
+
+  @override
+  String get activeSession => 'Yeroo Hojii';
+
+  @override
+  String get noActiveCredit => 'Liqiin Hojii Irra Jiru Hin Jiru';
+
+  @override
+  String get createYourShop => 'Suuqii Kee Uumi';
+
+  @override
+  String get createYourShopDesc =>
+      'Maamila galmeessuuf fi liqii hordofuuf sagantaa suuqii si barbaachisa.';
+
+  @override
+  String get createNewShop => 'Suuqii Haaraa Uumi';
+
+  @override
+  String get switchShop => 'SUUQII JIJJIIRI';
+
+  @override
+  String get addNewShop => 'Suuqii Haaraa Dabali';
+
+  @override
+  String get businessType => 'Gosa Daldalaa';
+
+  @override
+  String get create => 'Uumi';
+
+  @override
+  String get serverError => 'Dogoggora sarvarii';
+
+  @override
+  String get somethingWentWrong => 'Wanti tokko dogoggoreera';
+
+  @override
+  String get balance => 'HAFTEE';
+
+  @override
+  String get totalDebt => 'WALIIGALA LIQII';
+
+  @override
+  String get walletBalancePositive => 'HAFTEE WAALEETII (POOZATIIVII)';
+
+  @override
+  String get startDate => 'Guyyaa Jalqabaa';
+
+  @override
+  String get endDate => 'Guyyaa Dhumaa';
+
+  @override
+  String get timeline => 'TAAYIIMLAAYINII';
+
+  @override
+  String get payments => 'KAFFALTIIWWAN';
+
+  @override
+  String get noPhone => 'BILBILA HIN QABU';
+
+  @override
+  String get deleteCustomerAndRecords => 'Maamila fi galmee hunda haqi?';
+
+  @override
+  String get noDeadline => 'Beellamni Hin Jiru';
+
+  @override
+  String get paid => 'KAFFALAME';
+
+  @override
+  String get active => 'HOJII IRRA';
+
+  @override
+  String get paymentReceived => 'Kaffaltiin Argame';
+
+  @override
+  String remaining(String amount) {
+    return 'KAN HAFE: $amount Birrii';
+  }
+
+  @override
+  String get addItem => 'Meeshaa Dabali';
+
+  @override
+  String get addNew => 'Haaraa Dabali';
+
+  @override
+  String get pay => 'Kaffali';
+
+  @override
+  String get sessionLimitWarning =>
+      'Maamilni yeroo tokkotti yeroo hojii irra 2 ol qabaachuu hin danda\'u. Haaraa banuuf yeroo hojii irra tokko xumuri.';
+
+  @override
+  String get noCreditMatchesFilters =>
+      'Seenaa liqii filtar waliin walsimu hin jiru';
+
+  @override
+  String get noPaymentsMatchesFilters =>
+      'Kaffaltii filtar waliin walsimu hin jiru';
+
+  @override
+  String get deleteItem => 'Meeshaa Haqi';
+
+  @override
+  String get deleteItemConfirm =>
+      'Meeshaa kana haquuf mirkaneeffadhaa? Hafteen maamila ni haaromsa.';
+
+  @override
+  String get editItem => 'Meeshaa Sirreessi';
+
+  @override
+  String get itemName => 'Maqaa Meeshaa';
+
+  @override
+  String get byKg => 'KG dhaan';
+
+  @override
+  String get byQuantity => 'Baay\'ina dhaan';
+
+  @override
+  String get weightKg => 'Ulfaatina (KG)';
+
+  @override
+  String get quantity => 'Baay\'ina';
+
+  @override
+  String get pricePerKg => 'Gatii KG tti';
+
+  @override
+  String get pricePerItem => 'Gatii Meeshaa tti';
+
+  @override
+  String get pricePerKgEtb => 'Gatii KG tti (Birrii)';
+
+  @override
+  String get pricePerItemEtb => 'Gatii Meeshaa tti (Birrii)';
+
+  @override
+  String totalAmount(String amount) {
+    return 'Waliigala: $amount Birrii';
+  }
+
+  @override
+  String itemTotalAmount(String amount) {
+    return 'Waliigala Meeshaa: $amount Birrii';
+  }
+
+  @override
+  String get saveChanges => 'Jijjiirama Olkaa\'i';
+
+  @override
+  String get addToBasket => 'Qalqalloo tti Dabali';
+
+  @override
+  String get addItemToSession => 'Meeshaa Yeroo tti Dabali';
+
+  @override
+  String get raiseDispute => 'Komii Dhiheessi';
+
+  @override
+  String get complaintMessage => 'Ergaa Komii';
+
+  @override
+  String get complaintHint =>
+      'Maaliif gatiin yeroo kanaa sirrii akka hin taane yaada keessan galchaa...';
+
+  @override
+  String get submitDispute => 'Komii Ergi';
+
+  @override
+  String get disputeSubmitted =>
+      'Komiin abbaa suuqii tti milkaa\'inaan ergameera.';
+
+  @override
+  String get dispute => 'Komii';
+
+  @override
+  String get updateDeadline => 'Beellama Haaromsi';
+
+  @override
+  String get cancelSession => 'Yeroo Haqi';
+
+  @override
+  String get cancelSessionConfirm =>
+      'Yeroon kun akka haqameetti mallattaa\'a. Kun deebi\'uu hin danda\'u.';
+
+  @override
+  String get selectDate => 'Guyyaa Filadhu';
+
+  @override
+  String get newCreditSession => 'YEROO LIQII HAARAA';
+
+  @override
+  String get basketItems => 'MEESHAALEE QALQALLOO';
+
+  @override
+  String get deadlineOptional => 'BEELLAMA (DIRQAMA MITI)';
+
+  @override
+  String get selectDeadlineDate => 'Guyyaa Beellama Filadhu';
+
+  @override
+  String get total => 'WALIIGALA';
+
+  @override
+  String get saveSession => 'YEROO OLKAA\'I';
+
+  @override
+  String get recordPayment => 'KAFFALTII GALMEESSI';
+
+  @override
+  String get paymentAmountEtb => 'Hamma Kaffaltii (Birrii)';
+
+  @override
+  String get paymentMethod => 'MALA KAFFALTII';
+
+  @override
+  String get cash => 'Qarshii';
+
+  @override
+  String get mobileMoney => 'Maallaqa Mobaayilaa';
+
+  @override
+  String get bankTransfer => 'Dabarsa Baankii';
+
+  @override
+  String get other => 'Kan biraa';
+
+  @override
+  String get noteOptional => 'Yaadannoo (dirqama miti)';
+
+  @override
+  String get confirmPayment => 'KAFFALTII MIRKANEESSI';
+
+  @override
+  String get mustBeGreaterThanZero => '0 ol ta\'uu qaba';
+
+  @override
+  String get alerts => 'AKEEKKACHIISOTA';
+
+  @override
+  String get markAllAsRead => 'Hunda akka dubbifameetti mallattoo godhi';
+
+  @override
+  String get clearReadNotifications => 'Akeekkachiisota dubbifaman haqi';
+
+  @override
+  String get allNotificationsRead =>
+      'Akeekkachiisotni hundi akka dubbifameetti mallattaa\'eera';
+
+  @override
+  String get readNotificationsCleared =>
+      'Akeekkachiisotni dubbifaman haqameera';
+
+  @override
+  String get allClear => 'Hundi qulqulluu';
+
+  @override
+  String get noAlertsDescription =>
+      'Yeroo ammaa akeekkachiisa ykn beeksisa hin qabdu.';
+
+  @override
+  String get alert => 'Akeekkachiisa';
+
+  @override
+  String get saasPlafform => 'SaaS SAGANTAA';
+
+  @override
+  String due(String date) {
+    return 'BEELLAMA $date';
+  }
+
+  @override
+  String get account => 'HERREGA';
+
+  @override
+  String get shopDetails => 'BAL\'INA SUUQII';
+
+  @override
+  String get editShopDetails => 'Bal\'ina Suuqii Sirreessi';
+
+  @override
+  String get preferences => 'FILANNOOWWAN';
+
+  @override
+  String get dangerZone => 'KUTAA HAMAA';
+
+  @override
+  String get signOut => 'Bahuu';
+
+  @override
+  String get editShop => 'Suuqii Sirreessi';
+
+  @override
+  String get phone => 'Bilbila';
+
+  @override
+  String get email => 'Imeelii';
+
+  @override
+  String get address => 'Teessoo';
+
+  @override
+  String get save => 'Olkaa\'i';
+
+  @override
+  String get editProfile => 'Profaayilii Sirreessi';
+
+  @override
+  String updateProfileFailed(String error) {
+    return 'Profaayilii haaromsuun hin milkoofne: $error';
+  }
 }

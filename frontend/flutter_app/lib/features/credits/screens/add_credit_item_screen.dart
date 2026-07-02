@@ -9,6 +9,7 @@ import '../../../core/models/credit_item.dart';
 import '../../../core/models/credit_session.dart';
 import '../providers/credit_item_provider.dart';
 import '../../../shared/widgets/components/saas_components.dart';
+import '../../../l10n/app_localizations.dart';
 
 class AddCreditItemScreen extends ConsumerStatefulWidget {
   final String customerId;
@@ -71,8 +72,9 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('NEW CREDIT SESSION')),
+      appBar: AppBar(title: Text(l10n.newCreditSession.toUpperCase())),
       body: Column(
         children: [
           Expanded(
@@ -81,22 +83,22 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildItemInputCard(theme),
+                  _buildItemInputCard(theme, l10n),
                   const SizedBox(height: 32),
                   if (_items.isNotEmpty) ...[
-                    _buildSectionHeader('BASKET ITEMS'),
+                    _buildSectionHeader(l10n.basketItems),
                     const SizedBox(height: 16),
-                    _buildBasketList(theme),
+                    _buildBasketList(theme, l10n),
                     const SizedBox(height: 32),
-                    _buildSectionHeader('DEADLINE (OPTIONAL)'),
+                    _buildSectionHeader(l10n.deadlineOptional),
                     const SizedBox(height: 12),
-                    _buildDeadlineSelector(theme),
+                    _buildDeadlineSelector(theme, l10n),
                   ],
                 ],
               ),
             ),
           ),
-          _buildSummaryAndSave(),
+          _buildSummaryAndSave(l10n),
         ],
       ),
     );
@@ -106,7 +108,7 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
     return Text(title, style: Theme.of(context).textTheme.bodySmall?.copyWith(letterSpacing: 1.5, fontWeight: FontWeight.bold));
   }
 
-  Widget _buildItemInputCard(ThemeData theme) {
+  Widget _buildItemInputCard(ThemeData theme, AppLocalizations l10n) {
     return SaaSCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,14 +116,14 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
           TextFormField(
             controller: _itemName,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(labelText: 'Item Name', prefixIcon: Icon(Icons.shopping_bag_outlined)),
+            decoration: InputDecoration(labelText: l10n.itemName, prefixIcon: const Icon(Icons.shopping_bag_outlined)),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: ChoiceChip(
-                  label: const Center(child: Text('By KG')),
+                  label: Center(child: Text(l10n.byKg)),
                   selected: _isKg,
                   onSelected: (val) {
                     if (val) {
@@ -136,7 +138,7 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: ChoiceChip(
-                  label: const Center(child: Text('By Quantity')),
+                  label: Center(child: Text(l10n.byQuantity)),
                   selected: !_isKg,
                   onSelected: (val) {
                     if (val) {
@@ -158,7 +160,7 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
                   controller: _qty,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    labelText: _isKg ? 'Weight (KG)' : 'Quantity',
+                    labelText: _isKg ? l10n.weightKg : l10n.quantity,
                     prefixIcon: Icon(_isKg ? Icons.scale_outlined : Icons.numbers_outlined),
                   ),
                   onChanged: (_) => setState(() {}),
@@ -170,7 +172,7 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
                   controller: _price,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: InputDecoration(
-                    labelText: _isKg ? 'Price per KG (ETB)' : 'Price per Item (ETB)',
+                    labelText: _isKg ? l10n.pricePerKgEtb : l10n.pricePerItemEtb,
                     prefixIcon: const Icon(Icons.payments_outlined),
                   ),
                   onChanged: (_) => setState(() {}),
@@ -182,7 +184,7 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
             const SizedBox(height: 16),
             Center(
               child: Text(
-                'Item Total: ${_itemTotal.toStringAsFixed(0)} ETB',
+                l10n.itemTotalAmount(_itemTotal.toStringAsFixed(0)),
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: AppTheme.primary,
                   fontWeight: FontWeight.bold,
@@ -191,13 +193,13 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
             ),
           ],
           const SizedBox(height: 24),
-          SaaSButton(label: 'Add to Basket', variant: SaaSButtonVariant.secondary, icon: Icons.add, onPressed: _addItemToBasket),
+          SaaSButton(label: l10n.addToBasket, variant: SaaSButtonVariant.secondary, icon: Icons.add, onPressed: _addItemToBasket),
         ],
       ),
     );
   }
 
-  Widget _buildBasketList(ThemeData theme) {
+  Widget _buildBasketList(ThemeData theme, AppLocalizations l10n) {
     return Column(
       children: _items.asMap().entries.map((entry) {
         final i = entry.key;
@@ -212,11 +214,11 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(item.itemName, style: theme.textTheme.titleLarge?.copyWith(fontSize: 16)),
-                      Text('${item.quantity} ${item.unitType} x ${item.unitPrice} ETB', style: theme.textTheme.bodySmall),
+                      Text('${item.quantity} ${item.unitType == 'kg' ? l10n.byKg : l10n.byQuantity} x ${l10n.etbAmount(item.unitPrice.toStringAsFixed(0))}', style: theme.textTheme.bodySmall),
                     ],
                   ),
                 ),
-                Text('${(item.quantity * item.unitPrice).toStringAsFixed(0)} ETB', style: theme.textTheme.titleLarge?.copyWith(fontSize: 16, color: AppTheme.primary)),
+                Text(l10n.etbAmount((item.quantity * item.unitPrice).toStringAsFixed(0)), style: theme.textTheme.titleLarge?.copyWith(fontSize: 16, color: AppTheme.primary)),
                 IconButton(icon: const Icon(Icons.remove_circle_outline, color: AppTheme.error, size: 20), onPressed: () => setState(() => _items.removeAt(i))),
               ],
             ),
@@ -226,8 +228,8 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
     );
   }
 
-  Widget _buildDeadlineSelector(ThemeData theme) {
-    final deadlineStr = _deadline != null ? DateFormat('MMM dd, yyyy').format(_deadline!.toLocal()) : 'Select Deadline Date';
+  Widget _buildDeadlineSelector(ThemeData theme, AppLocalizations l10n) {
+    final deadlineStr = _deadline != null ? DateFormat('MMM dd, yyyy').format(_deadline!.toLocal()) : l10n.selectDeadlineDate;
     return SaaSCard(
       onTap: () async {
         final picked = await showEthiopianDatePicker(context: context, initialDate: DateTime.now());
@@ -251,10 +253,10 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
     );
   }
 
-  Widget _buildSummaryAndSave() {
+  Widget _buildSummaryAndSave(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(color: AppTheme.background, border: Border(top: BorderSide(color: const Color(0xFFE2E8F0)))),
+      decoration: const BoxDecoration(color: AppTheme.background, border: Border(top: BorderSide(color: Color(0xFFE2E8F0)))),
       child: Row(
         children: [
           Expanded(
@@ -262,13 +264,13 @@ class _AddCreditItemScreenState extends ConsumerState<AddCreditItemScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('TOTAL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: AppTheme.textMuted)),
-                Text('${_total.toStringAsFixed(0)} ETB', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                Text(l10n.total.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: AppTheme.textMuted)),
+                Text(l10n.etbAmount(_total.toStringAsFixed(0)), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primary)),
               ],
             ),
           ),
           const SizedBox(width: 24),
-          Expanded(flex: 2, child: SaaSButton(label: 'SAVE SESSION', isLoading: _saving, onPressed: _items.isEmpty ? null : _saveSession)),
+          Expanded(flex: 2, child: SaaSButton(label: l10n.saveSession, isLoading: _saving, onPressed: _items.isEmpty ? null : _saveSession)),
         ],
       ),
     );

@@ -363,4 +363,383 @@ class AppLocalizationsAm extends AppLocalizations {
 
   @override
   String get noTransactions => 'እስካሁን ምንም ግብይቶች አልተመዘገቡም';
+
+  @override
+  String get dubebook => 'ዱቤቡክ';
+
+  @override
+  String get secureCreditManagement => 'ደህንነቱ የተጠበቀ ብድር አስተዳደር';
+
+  @override
+  String get emailOrUsername => 'ኢሜይል ወይም የተጠቃሚ ስም';
+
+  @override
+  String get password => 'የይለፍ ቃል';
+
+  @override
+  String get signIn => 'ግባ';
+
+  @override
+  String get newHere => 'አዲስ ነዎት? ';
+
+  @override
+  String get createAccount => 'መለያ ይፍጠሩ';
+
+  @override
+  String get joinDubebook => 'ዱቤቡክ ይቀላቀሉ';
+
+  @override
+  String get startManagingCredit => 'ብድር በደህንነት ማስተዳደር ይጀምሩ';
+
+  @override
+  String get retailer => 'ቸርቻሪ';
+
+  @override
+  String get customer => 'ደንበኛ';
+
+  @override
+  String get username => 'የተጠቃሚ ስም';
+
+  @override
+  String get phoneNumber => 'ስልክ ቁጥር';
+
+  @override
+  String get emailAddress => 'ኢሜይል አድራሻ';
+
+  @override
+  String get createAccountBtn => 'መለያ ፍጠር';
+
+  @override
+  String get haveAccount => 'መለያ አለዎት? ';
+
+  @override
+  String get required => 'ያስፈልጋል';
+
+  @override
+  String get myPortal => 'የእኔ ፖርታል';
+
+  @override
+  String get totalAggregateDebt => 'ጠቅላላ ድምር ዕዳ';
+
+  @override
+  String get myCreditAccounts => 'የእኔ የብድር ሂሳቦች';
+
+  @override
+  String get unknownShop => 'ያልታወቀ ሱቅ';
+
+  @override
+  String get customers => 'ደንበኞች';
+
+  @override
+  String get noCustomersFoundLower => 'ደንበኞች አልተገኙም';
+
+  @override
+  String get searchCustomers => 'ደንበኞችን ይፈልጉ...';
+
+  @override
+  String etbAmount(String amount) {
+    return '$amount ብር';
+  }
+
+  @override
+  String get activeSession => 'ንቁ ክፍለ-ጊዜ';
+
+  @override
+  String get noActiveCredit => 'ንቁ ብድር የለም';
+
+  @override
+  String get createYourShop => 'ሱቅዎን ይፍጠሩ';
+
+  @override
+  String get createYourShopDesc => 'ደንበኞችን ለመመዝገብ እና ብድር ለመከታተል የሱቅ ገጽ ያስፈልጋል።';
+
+  @override
+  String get createNewShop => 'አዲስ ሱቅ ፍጠር';
+
+  @override
+  String get switchShop => 'ሱቅ ቀይር';
+
+  @override
+  String get addNewShop => 'አዲስ ሱቅ ጨምር';
+
+  @override
+  String get businessType => 'የንግድ ዓይነት';
+
+  @override
+  String get create => 'ፍጠር';
+
+  @override
+  String get serverError => 'የሰርቨር ስህተት';
+
+  @override
+  String get somethingWentWrong => 'ችግር ተፈጠረ';
+
+  @override
+  String get balance => 'ቀሪ ሂሳብ';
+
+  @override
+  String get totalDebt => 'ጠቅላላ ዕዳ';
+
+  @override
+  String get walletBalancePositive => 'የዋሌት ቀሪ ሂሳብ (ፖዘቲቭ)';
+
+  @override
+  String get startDate => 'መጀመሪያ ቀን';
+
+  @override
+  String get endDate => 'መጨረሻ ቀን';
+
+  @override
+  String get timeline => 'ታይምላይን';
+
+  @override
+  String get payments => 'ክፍያዎች';
+
+  @override
+  String get noPhone => 'ስልክ የለም';
+
+  @override
+  String get deleteCustomerAndRecords => 'ደንበኛ እና ሁሉንም ሪከርዶች ይሰርዙ?';
+
+  @override
+  String get noDeadline => 'ቀነ-ገደብ የለም';
+
+  @override
+  String get paid => 'ተከፍሏል';
+
+  @override
+  String get active => 'ንቁ';
+
+  @override
+  String get paymentReceived => 'ክፍያ ተቀብሏል';
+
+  @override
+  String remaining(String amount) {
+    return 'ቀሪ: $amount ብር';
+  }
+
+  @override
+  String get addItem => 'ዕቃ ጨምር';
+
+  @override
+  String get addNew => 'አዲስ ጨምር';
+
+  @override
+  String get pay => 'ክፈል';
+
+  @override
+  String get sessionLimitWarning =>
+      'ደንበኛ ከ2 በላይ ንቁ ክፍለ-ጊዜዎች ሊኖሩት አይችልም። አዲስ ለመክፈት ክፍለ-ጊዜ ያጠናቁ።';
+
+  @override
+  String get noCreditMatchesFilters => 'ከማጣሪያ ጋር የሚዛመድ የብድር ታሪክ የለም';
+
+  @override
+  String get noPaymentsMatchesFilters => 'ከማጣሪያ ጋር የሚዛመድ ክፍያ የለም';
+
+  @override
+  String get deleteItem => 'ዕቃ ሰርዝ';
+
+  @override
+  String get deleteItemConfirm => 'ይህን ዕቃ መሰረዝ ይፈልጋሉ? የደንበኛው ቀሪ ሂሳብ ይዘምናል።';
+
+  @override
+  String get editItem => 'ዕቃ አስተካክል';
+
+  @override
+  String get itemName => 'የዕቃ ስም';
+
+  @override
+  String get byKg => 'በኪሎ';
+
+  @override
+  String get byQuantity => 'በብዛት';
+
+  @override
+  String get weightKg => 'ክብደት (ኪ.ግ.)';
+
+  @override
+  String get quantity => 'ብዛት';
+
+  @override
+  String get pricePerKg => 'በኪሎ ዋጋ';
+
+  @override
+  String get pricePerItem => 'በዕቃ ዋጋ';
+
+  @override
+  String get pricePerKgEtb => 'በኪሎ ዋጋ (ብር)';
+
+  @override
+  String get pricePerItemEtb => 'በዕቃ ዋጋ (ብር)';
+
+  @override
+  String totalAmount(String amount) {
+    return 'ጠቅላላ: $amount ብር';
+  }
+
+  @override
+  String itemTotalAmount(String amount) {
+    return 'የዕቃ ጠቅላላ: $amount ብር';
+  }
+
+  @override
+  String get saveChanges => 'ለውጦችን አስቀምጥ';
+
+  @override
+  String get addToBasket => 'ወደ ቅርጫት ጨምር';
+
+  @override
+  String get addItemToSession => 'ዕቃ ወደ ክፍለ-ጊዜ ጨምር';
+
+  @override
+  String get raiseDispute => 'አቤቱታ አቅርብ';
+
+  @override
+  String get complaintMessage => 'የአቤቱታ መልዕክት';
+
+  @override
+  String get complaintHint => 'ለምን የዚህ ክፍለ-ጊዜ መጠን ትክክል ያልሆነ ይመስልዎታል ያስገቡ...';
+
+  @override
+  String get submitDispute => 'አቤቱታ አስገባ';
+
+  @override
+  String get disputeSubmitted => 'አቤቱታ ለሱቅ ባለቤት በተሳካ ሁኔታ ተልኳል።';
+
+  @override
+  String get dispute => 'አቤቱታ';
+
+  @override
+  String get updateDeadline => 'ቀነ-ገደብ አዘምን';
+
+  @override
+  String get cancelSession => 'ክፍለ-ጊዜ ሰርዝ';
+
+  @override
+  String get cancelSessionConfirm => 'ይህ ክፍለ-ጊዜ እንደ ተሰረዘ ይሰላል። ይህ ሊቀለበስ አይችልም።';
+
+  @override
+  String get selectDate => 'ቀን ይምረጡ';
+
+  @override
+  String get newCreditSession => 'አዲስ የብድር ክፍለ-ጊዜ';
+
+  @override
+  String get basketItems => 'የቅርጫት ዕቃዎች';
+
+  @override
+  String get deadlineOptional => 'ቀነ-ገደብ (አማራጭ)';
+
+  @override
+  String get selectDeadlineDate => 'የቀነ-ገደብ ቀን ይምረጡ';
+
+  @override
+  String get total => 'ጠቅላላ';
+
+  @override
+  String get saveSession => 'ክፍለ-ጊዜ አስቀምጥ';
+
+  @override
+  String get recordPayment => 'ክፍያ መዝግብ';
+
+  @override
+  String get paymentAmountEtb => 'የክፍያ መጠን (ብር)';
+
+  @override
+  String get paymentMethod => 'የክፍያ ዘዴ';
+
+  @override
+  String get cash => 'ጥሬ ገንዘብ';
+
+  @override
+  String get mobileMoney => 'ሞባይል ገንዘብ';
+
+  @override
+  String get bankTransfer => 'የባንክ ዝውውር';
+
+  @override
+  String get other => 'ሌላ';
+
+  @override
+  String get noteOptional => 'ማስታወሻ (አማራጭ)';
+
+  @override
+  String get confirmPayment => 'ክፍያ አረጋግጥ';
+
+  @override
+  String get mustBeGreaterThanZero => 'ከ0 በላይ መሆን አለበት';
+
+  @override
+  String get alerts => 'ማንቂያዎች';
+
+  @override
+  String get markAllAsRead => 'ሁሉንም እንደ ተነበበ ምልክት አድርግ';
+
+  @override
+  String get clearReadNotifications => 'የተነበቡ ማንቂያዎችን አጥፋ';
+
+  @override
+  String get allNotificationsRead => 'ሁሉም ማንቂያዎች እንደ ተነበበ ተምልክተዋል';
+
+  @override
+  String get readNotificationsCleared => 'የተነበቡ ማንቂያዎች ተጠርገዋል';
+
+  @override
+  String get allClear => 'ሁሉም ተጠርጓል';
+
+  @override
+  String get noAlertsDescription => 'በአሁኑ ጊዜ ማንቂያ ወይም ማስታወቂያ የለዎትም።';
+
+  @override
+  String get alert => 'ማንቂያ';
+
+  @override
+  String get saasPlafform => 'SaaS መድረክ';
+
+  @override
+  String due(String date) {
+    return 'ቀነ-ገደብ $date';
+  }
+
+  @override
+  String get account => 'መለያ';
+
+  @override
+  String get shopDetails => 'የሱቅ ዝርዝሮች';
+
+  @override
+  String get editShopDetails => 'የሱቅ ዝርዝሮችን አስተካክል';
+
+  @override
+  String get preferences => 'ምርጫዎች';
+
+  @override
+  String get dangerZone => 'አደገኛ ቀጠና';
+
+  @override
+  String get signOut => 'ውጣ';
+
+  @override
+  String get editShop => 'ሱቅ አስተካክል';
+
+  @override
+  String get phone => 'ስልክ';
+
+  @override
+  String get email => 'ኢሜይል';
+
+  @override
+  String get address => 'አድራሻ';
+
+  @override
+  String get save => 'አስቀምጥ';
+
+  @override
+  String get editProfile => 'መገለጫ አስተካክል';
+
+  @override
+  String updateProfileFailed(String error) {
+    return 'መገለጫ ማዘመን አልተሳካም: $error';
+  }
 }

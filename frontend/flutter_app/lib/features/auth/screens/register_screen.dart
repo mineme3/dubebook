@@ -65,75 +65,75 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     const Icon(Icons.person_add_outlined, size: 48, color: AppTheme.primary),
                     const SizedBox(height: 24),
-                    Text('JOIN DUBEBOOK', style: theme.textTheme.headlineMedium?.copyWith(
+                    Text(l10n.joinDubebook, style: theme.textTheme.headlineMedium?.copyWith(
                       letterSpacing: 2,
                       fontWeight: FontWeight.w900,
                     )),
                     const SizedBox(height: 4),
-                    Text('START MANAGING CREDIT SECURELY', style: theme.textTheme.bodySmall?.copyWith(
+                    Text(l10n.startManagingCredit, style: theme.textTheme.bodySmall?.copyWith(
                       letterSpacing: 1.5,
                       fontWeight: FontWeight.bold,
                       fontSize: 10,
                     )),
-                const SizedBox(height: 48),
+                    const SizedBox(height: 48),
 
-                // Role Selection
-                Row(
-                  children: [
-                    Expanded(child: _RoleButton(label: 'RETAILER', isSelected: _selectedRole == 'SHOP_OWNER', onTap: () => setState(() => _selectedRole = 'SHOP_OWNER'))),
-                    const SizedBox(width: 12),
-                    Expanded(child: _RoleButton(label: 'CUSTOMER', isSelected: _selectedRole == 'CUSTOMER', onTap: () => setState(() => _selectedRole = 'CUSTOMER'))),
-                  ],
-                ),
-                const SizedBox(height: 32),
+                    // Role Selection
+                    Row(
+                      children: [
+                        Expanded(child: _RoleButton(label: l10n.retailer, isSelected: _selectedRole == 'SHOP_OWNER', onTap: () => setState(() => _selectedRole = 'SHOP_OWNER'))),
+                        const SizedBox(width: 12),
+                        Expanded(child: _RoleButton(label: l10n.customer, isSelected: _selectedRole == 'CUSTOMER', onTap: () => setState(() => _selectedRole = 'CUSTOMER'))),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
 
-                _field(_fullName, 'Full Name', Icons.person_outline),
-                const SizedBox(height: 16),
-                _field(_username, 'Username', Icons.alternate_email),
-                const SizedBox(height: 16),
-                _field(_phone, 'Phone Number', Icons.phone_outlined, kb: TextInputType.phone),
-                const SizedBox(height: 16),
-                _field(_email, 'Email Address', Icons.email_outlined, kb: TextInputType.emailAddress),
-                
-                if (_selectedRole == 'SHOP_OWNER') ...[
-                  const SizedBox(height: 16),
-                  _field(_shopName, 'Shop Name', Icons.storefront_outlined),
-                ],
+                    _field(_fullName, l10n.fullName, Icons.person_outline, l10n.required),
+                    const SizedBox(height: 16),
+                    _field(_username, l10n.username, Icons.alternate_email, l10n.required),
+                    const SizedBox(height: 16),
+                    _field(_phone, l10n.phoneNumber, Icons.phone_outlined, l10n.required, kb: TextInputType.phone),
+                    const SizedBox(height: 16),
+                    _field(_email, l10n.emailAddress, Icons.email_outlined, l10n.required, kb: TextInputType.emailAddress),
+                    
+                    if (_selectedRole == 'SHOP_OWNER') ...[
+                      const SizedBox(height: 16),
+                      _field(_shopName, l10n.shopNameLabel, Icons.storefront_outlined, l10n.required),
+                    ],
 
-                const SizedBox(height: 16),
-                _field(_password, 'Password', Icons.lock_outline, obscure: true),
-                const SizedBox(height: 32),
+                    const SizedBox(height: 16),
+                    _field(_password, l10n.password, Icons.lock_outline, l10n.required, obscure: true),
+                    const SizedBox(height: 32),
 
-                SaaSButton(label: 'CREATE ACCOUNT', isLoading: _loading, onPressed: _register),
-                const SizedBox(height: 24),
+                    SaaSButton(label: l10n.createAccountBtn, isLoading: _loading, onPressed: _register),
+                    const SizedBox(height: 24),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Have an account? ", style: TextStyle(color: tokens.onSurfaceMuted)),
-                    GestureDetector(
-                      onTap: () => context.go('/login'),
-                      child: const Text('Sign In', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(l10n.haveAccount, style: TextStyle(color: tokens.onSurfaceMuted)),
+                        GestureDetector(
+                          onTap: () => context.go('/login'),
+                          child: Text(l10n.signIn, style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
           ),
         ),
       ),
     );
   }
 
-  Widget _field(TextEditingController c, String l, IconData i, {TextInputType kb = TextInputType.text, bool obscure = false}) =>
+  Widget _field(TextEditingController c, String l, IconData i, String requiredMsg, {TextInputType kb = TextInputType.text, bool obscure = false}) =>
       TextFormField(
         controller: c,
         keyboardType: kb,
         obscureText: obscure,
         decoration: InputDecoration(labelText: l, prefixIcon: Icon(i)),
-        validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+        validator: (v) => (v == null || v.isEmpty) ? requiredMsg : null,
       );
 }
 

@@ -4,6 +4,7 @@ import '../../../utils/theme.dart';
 import '../../../utils/ethiopian_calendar.dart';
 import '../../../core/providers/api_client_provider.dart';
 import '../../../shared/widgets/components/saas_components.dart';
+import '../../../l10n/app_localizations.dart';
 
 final notificationLogProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final dio = ref.watch(dioProvider);
@@ -19,14 +20,15 @@ class NotificationLogScreen extends ConsumerWidget {
     final logsAsync = ref.watch(notificationLogProvider);
     final locale = Localizations.localeOf(context).languageCode;
     final tokens = Theme.of(context).extension<DubeTokens>()!;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ALERTS'),
+        title: Text(l10n.alerts.toUpperCase()),
         actions: [
           IconButton(
             icon: const Icon(Icons.mark_chat_read_outlined),
-            tooltip: 'Mark all as read',
+            tooltip: l10n.markAllAsRead,
             onPressed: () async {
               try {
                 final dio = ref.read(dioProvider);
@@ -34,7 +36,7 @@ class NotificationLogScreen extends ConsumerWidget {
                 ref.invalidate(notificationLogProvider);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('All notifications marked as read')),
+                    SnackBar(content: Text(l10n.allNotificationsRead)),
                   );
                 }
               } catch (e) {
@@ -48,7 +50,7 @@ class NotificationLogScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.delete_sweep_outlined),
-            tooltip: 'Clear read notifications',
+            tooltip: l10n.clearReadNotifications,
             onPressed: () async {
               try {
                 final dio = ref.read(dioProvider);
@@ -56,7 +58,7 @@ class NotificationLogScreen extends ConsumerWidget {
                 ref.invalidate(notificationLogProvider);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Read notifications cleared')),
+                    SnackBar(content: Text(l10n.readNotificationsCleared)),
                   );
                 }
               } catch (e) {
@@ -79,10 +81,10 @@ class NotificationLogScreen extends ConsumerWidget {
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (logs) {
           if (logs.isEmpty) {
-            return const SaaSEmptyState(
+            return SaaSEmptyState(
               icon: Icons.notifications_none_rounded,
-              title: 'All clear',
-              description: 'You have no alerts or notifications at this time.',
+              title: l10n.allClear,
+              description: l10n.noAlertsDescription,
             );
           }
 
@@ -93,7 +95,7 @@ class NotificationLogScreen extends ConsumerWidget {
               final log = logs[index];
               final id = log['id'] as String? ?? '';
               final type = log['type'] as String? ?? 'info';
-              final title = log['title'] as String? ?? 'Alert';
+              final title = log['title'] as String? ?? l10n.alert;
               final message = log['message'] as String? ?? '';
               final createdAtStr = log['createdAt'] as String?;
               final createdAt = createdAtStr != null ? DateTime.tryParse(createdAtStr) : null;

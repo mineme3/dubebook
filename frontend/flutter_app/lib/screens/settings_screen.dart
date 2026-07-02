@@ -27,7 +27,7 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
         children: [
           if (owner != null) ...[
-            _buildSectionHeader(context, 'ACCOUNT'),
+            _buildSectionHeader(context, l.account),
             SaaSCard(
               child: Row(
                 children: [
@@ -48,7 +48,7 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit_outlined, color: AppTheme.primary),
-                    onPressed: () => _showEditProfileDialog(context, ref, owner),
+                    onPressed: () => _showEditProfileDialog(context, ref, owner, l),
                   ),
                 ],
               ),
@@ -56,7 +56,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 24),
           ],
           if (owner != null && owner.role == 'SHOP_OWNER' && selectedShop != null) ...[
-            _buildSectionHeader(context, 'SHOP DETAILS'),
+            _buildSectionHeader(context, l.shopDetails),
             SaaSCard(
               child: Column(
                 children: [
@@ -77,17 +77,17 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   SaaSButton(
-                    label: 'Edit Shop Details', 
+                    label: l.editShopDetails, 
                     variant: SaaSButtonVariant.secondary, 
                     icon: Icons.edit_outlined, 
-                    onPressed: () => _showEditShopDialog(context, ref, selectedShop)
+                    onPressed: () => _showEditShopDialog(context, ref, selectedShop, l)
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
           ],
-          _buildSectionHeader(context, 'PREFERENCES'),
+          _buildSectionHeader(context, l.preferences),
           _buildSettingsTile(
             context,
             icon: Icons.translate,
@@ -96,9 +96,9 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => _showLanguageDialog(context),
           ),
           const SizedBox(height: 24),
-          _buildSectionHeader(context, 'DANGER ZONE'),
+          _buildSectionHeader(context, l.dangerZone),
           SaaSButton(
-            label: 'Sign Out',
+            label: l.signOut,
             variant: SaaSButtonVariant.ghost,
             icon: Icons.logout_rounded,
             onPressed: () async {
@@ -114,7 +114,7 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   const Icon(Icons.shield_moon_outlined, size: 48),
                   const SizedBox(height: 8),
-                  Text('DUBEBOOK SaaS v1.0', style: Theme.of(context).textTheme.bodySmall?.copyWith(letterSpacing: 2, fontWeight: FontWeight.bold)),
+                  Text('${l.appName} SaaS v1.0', style: Theme.of(context).textTheme.bodySmall?.copyWith(letterSpacing: 2, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -162,7 +162,7 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l.changeLanguage),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             _LanguageOption(name: 'English', code: 'en'),
@@ -175,7 +175,7 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditShopDialog(BuildContext context, WidgetRef ref, Shop shop) {
+  void _showEditShopDialog(BuildContext context, WidgetRef ref, Shop shop, AppLocalizations l) {
     final name = TextEditingController(text: shop.name);
     final type = TextEditingController(text: shop.businessType);
     final phone = TextEditingController(text: shop.phone ?? '');
@@ -184,27 +184,27 @@ class SettingsScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit Shop'),
+        title: Text(l.editShop),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: name, decoration: const InputDecoration(labelText: 'Shop Name')),
+              TextField(controller: name, decoration: InputDecoration(labelText: l.shopNameLabel)),
               const SizedBox(height: 16),
-              TextField(controller: type, decoration: const InputDecoration(labelText: 'Business Type')),
+              TextField(controller: type, decoration: InputDecoration(labelText: l.businessType)),
               const SizedBox(height: 16),
-              TextField(controller: phone, decoration: const InputDecoration(labelText: 'Phone')),
+              TextField(controller: phone, decoration: InputDecoration(labelText: l.phone)),
               const SizedBox(height: 16),
-              TextField(controller: email, decoration: const InputDecoration(labelText: 'Email')),
+              TextField(controller: email, decoration: InputDecoration(labelText: l.email)),
               const SizedBox(height: 16),
-              TextField(controller: address, decoration: const InputDecoration(labelText: 'Address')),
+              TextField(controller: address, decoration: InputDecoration(labelText: l.address)),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l.cancel)),
           SaaSButton(
-            label: 'Save',
+            label: l.save,
             isFullWidth: false,
             onPressed: () async {
               if (name.text.isEmpty) return;
@@ -225,30 +225,30 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditProfileDialog(BuildContext context, WidgetRef ref, Owner owner) {
+  void _showEditProfileDialog(BuildContext context, WidgetRef ref, Owner owner, AppLocalizations l) {
     final fullName = TextEditingController(text: owner.fullName);
     final phone = TextEditingController(text: owner.phone);
     final email = TextEditingController(text: owner.email);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit Profile'),
+        title: Text(l.editProfile),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: fullName, decoration: const InputDecoration(labelText: 'Full Name')),
+              TextField(controller: fullName, decoration: InputDecoration(labelText: l.fullName)),
               const SizedBox(height: 16),
-              TextField(controller: phone, decoration: const InputDecoration(labelText: 'Phone Number')),
+              TextField(controller: phone, decoration: InputDecoration(labelText: l.phoneNumber)),
               const SizedBox(height: 16),
-              TextField(controller: email, decoration: const InputDecoration(labelText: 'Email Address')),
+              TextField(controller: email, decoration: InputDecoration(labelText: l.emailAddress)),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l.cancel)),
           SaaSButton(
-            label: 'Save',
+            label: l.save,
             isFullWidth: false,
             onPressed: () async {
               if (fullName.text.isEmpty || phone.text.isEmpty || email.text.isEmpty) return;
@@ -262,7 +262,7 @@ class SettingsScreen extends ConsumerWidget {
               } catch (e) {
                 if (ctx.mounted) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(content: Text('Failed to update profile: $e')),
+                    SnackBar(content: Text(l.updateProfileFailed(e.toString()))),
                   );
                 }
               }

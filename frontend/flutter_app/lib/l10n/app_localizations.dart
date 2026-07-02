@@ -767,6 +767,738 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'NO TRANSACTIONS RECORDED YET'**
   String get noTransactions;
+
+  /// No description provided for @dubebook.
+  ///
+  /// In en, this message translates to:
+  /// **'DUBEBOOK'**
+  String get dubebook;
+
+  /// No description provided for @secureCreditManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'SECURE CREDIT MANAGEMENT'**
+  String get secureCreditManagement;
+
+  /// No description provided for @emailOrUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or Username'**
+  String get emailOrUsername;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'SIGN IN'**
+  String get signIn;
+
+  /// No description provided for @newHere.
+  ///
+  /// In en, this message translates to:
+  /// **'New here? '**
+  String get newHere;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
+
+  /// No description provided for @joinDubebook.
+  ///
+  /// In en, this message translates to:
+  /// **'JOIN DUBEBOOK'**
+  String get joinDubebook;
+
+  /// No description provided for @startManagingCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'START MANAGING CREDIT SECURELY'**
+  String get startManagingCredit;
+
+  /// No description provided for @retailer.
+  ///
+  /// In en, this message translates to:
+  /// **'RETAILER'**
+  String get retailer;
+
+  /// No description provided for @customer.
+  ///
+  /// In en, this message translates to:
+  /// **'CUSTOMER'**
+  String get customer;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
+
+  /// No description provided for @emailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get emailAddress;
+
+  /// No description provided for @createAccountBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'CREATE ACCOUNT'**
+  String get createAccountBtn;
+
+  /// No description provided for @haveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Have an account? '**
+  String get haveAccount;
+
+  /// No description provided for @required.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get required;
+
+  /// No description provided for @myPortal.
+  ///
+  /// In en, this message translates to:
+  /// **'MY PORTAL'**
+  String get myPortal;
+
+  /// No description provided for @totalAggregateDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL AGGREGATE DEBT'**
+  String get totalAggregateDebt;
+
+  /// No description provided for @myCreditAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'MY CREDIT ACCOUNTS'**
+  String get myCreditAccounts;
+
+  /// No description provided for @unknownShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Shop'**
+  String get unknownShop;
+
+  /// No description provided for @customers.
+  ///
+  /// In en, this message translates to:
+  /// **'CUSTOMERS'**
+  String get customers;
+
+  /// No description provided for @noCustomersFoundLower.
+  ///
+  /// In en, this message translates to:
+  /// **'No customers found'**
+  String get noCustomersFoundLower;
+
+  /// No description provided for @searchCustomers.
+  ///
+  /// In en, this message translates to:
+  /// **'Search customers...'**
+  String get searchCustomers;
+
+  /// No description provided for @etbAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} ETB'**
+  String etbAmount(String amount);
+
+  /// No description provided for @activeSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Session'**
+  String get activeSession;
+
+  /// No description provided for @noActiveCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'No Active Credit'**
+  String get noActiveCredit;
+
+  /// No description provided for @createYourShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your Shop'**
+  String get createYourShop;
+
+  /// No description provided for @createYourShopDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You need a shop profile to begin registering customers and tracking credits.'**
+  String get createYourShopDesc;
+
+  /// No description provided for @createNewShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Shop'**
+  String get createNewShop;
+
+  /// No description provided for @switchShop.
+  ///
+  /// In en, this message translates to:
+  /// **'SWITCH SHOP'**
+  String get switchShop;
+
+  /// No description provided for @addNewShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Shop'**
+  String get addNewShop;
+
+  /// No description provided for @businessType.
+  ///
+  /// In en, this message translates to:
+  /// **'Business Type'**
+  String get businessType;
+
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// No description provided for @serverError.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error'**
+  String get serverError;
+
+  /// No description provided for @somethingWentWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong'**
+  String get somethingWentWrong;
+
+  /// No description provided for @balance.
+  ///
+  /// In en, this message translates to:
+  /// **'BALANCE'**
+  String get balance;
+
+  /// No description provided for @totalDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL DEBT'**
+  String get totalDebt;
+
+  /// No description provided for @walletBalancePositive.
+  ///
+  /// In en, this message translates to:
+  /// **'WALLET BALANCE (POSITIVE)'**
+  String get walletBalancePositive;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get endDate;
+
+  /// No description provided for @timeline.
+  ///
+  /// In en, this message translates to:
+  /// **'TIMELINE'**
+  String get timeline;
+
+  /// No description provided for @payments.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENTS'**
+  String get payments;
+
+  /// No description provided for @noPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'NO PHONE'**
+  String get noPhone;
+
+  /// No description provided for @deleteCustomerAndRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete customer and all records?'**
+  String get deleteCustomerAndRecords;
+
+  /// No description provided for @noDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'No Deadline'**
+  String get noDeadline;
+
+  /// No description provided for @paid.
+  ///
+  /// In en, this message translates to:
+  /// **'PAID'**
+  String get paid;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE'**
+  String get active;
+
+  /// No description provided for @paymentReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Received'**
+  String get paymentReceived;
+
+  /// No description provided for @remaining.
+  ///
+  /// In en, this message translates to:
+  /// **'REMAINING: {amount} ETB'**
+  String remaining(String amount);
+
+  /// No description provided for @addItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item'**
+  String get addItem;
+
+  /// No description provided for @addNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New'**
+  String get addNew;
+
+  /// No description provided for @pay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get pay;
+
+  /// No description provided for @sessionLimitWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'A customer can have at most 2 active sessions. Settle a session to open a new one.'**
+  String get sessionLimitWarning;
+
+  /// No description provided for @noCreditMatchesFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'No credit history matches filters'**
+  String get noCreditMatchesFilters;
+
+  /// No description provided for @noPaymentsMatchesFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'No payments recorded matching filters'**
+  String get noPaymentsMatchesFilters;
+
+  /// No description provided for @deleteItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Item'**
+  String get deleteItem;
+
+  /// No description provided for @deleteItemConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this item? Customer balance will be updated.'**
+  String get deleteItemConfirm;
+
+  /// No description provided for @editItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Item'**
+  String get editItem;
+
+  /// No description provided for @itemName.
+  ///
+  /// In en, this message translates to:
+  /// **'Item Name'**
+  String get itemName;
+
+  /// No description provided for @byKg.
+  ///
+  /// In en, this message translates to:
+  /// **'By KG'**
+  String get byKg;
+
+  /// No description provided for @byQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'By Quantity'**
+  String get byQuantity;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (KG)'**
+  String get weightKg;
+
+  /// No description provided for @quantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get quantity;
+
+  /// No description provided for @pricePerKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per KG'**
+  String get pricePerKg;
+
+  /// No description provided for @pricePerItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per Item'**
+  String get pricePerItem;
+
+  /// No description provided for @pricePerKgEtb.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per KG (ETB)'**
+  String get pricePerKgEtb;
+
+  /// No description provided for @pricePerItemEtb.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per Item (ETB)'**
+  String get pricePerItemEtb;
+
+  /// No description provided for @totalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total: {amount} ETB'**
+  String totalAmount(String amount);
+
+  /// No description provided for @itemTotalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Item Total: {amount} ETB'**
+  String itemTotalAmount(String amount);
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @addToBasket.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Basket'**
+  String get addToBasket;
+
+  /// No description provided for @addItemToSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item to Session'**
+  String get addItemToSession;
+
+  /// No description provided for @raiseDispute.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise a Dispute'**
+  String get raiseDispute;
+
+  /// No description provided for @complaintMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Complaint Message'**
+  String get complaintMessage;
+
+  /// No description provided for @complaintHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter why you think this session amount is incorrect...'**
+  String get complaintHint;
+
+  /// No description provided for @submitDispute.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Dispute'**
+  String get submitDispute;
+
+  /// No description provided for @disputeSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispute submitted successfully to shop owner.'**
+  String get disputeSubmitted;
+
+  /// No description provided for @dispute.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispute'**
+  String get dispute;
+
+  /// No description provided for @updateDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Deadline'**
+  String get updateDeadline;
+
+  /// No description provided for @cancelSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Session'**
+  String get cancelSession;
+
+  /// No description provided for @cancelSessionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'This session will be marked as cancelled. This cannot be undone.'**
+  String get cancelSessionConfirm;
+
+  /// No description provided for @selectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date'**
+  String get selectDate;
+
+  /// No description provided for @newCreditSession.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW CREDIT SESSION'**
+  String get newCreditSession;
+
+  /// No description provided for @basketItems.
+  ///
+  /// In en, this message translates to:
+  /// **'BASKET ITEMS'**
+  String get basketItems;
+
+  /// No description provided for @deadlineOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'DEADLINE (OPTIONAL)'**
+  String get deadlineOptional;
+
+  /// No description provided for @selectDeadlineDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Deadline Date'**
+  String get selectDeadlineDate;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL'**
+  String get total;
+
+  /// No description provided for @saveSession.
+  ///
+  /// In en, this message translates to:
+  /// **'SAVE SESSION'**
+  String get saveSession;
+
+  /// No description provided for @recordPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'RECORD PAYMENT'**
+  String get recordPayment;
+
+  /// No description provided for @paymentAmountEtb.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Amount (ETB)'**
+  String get paymentAmountEtb;
+
+  /// No description provided for @paymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT METHOD'**
+  String get paymentMethod;
+
+  /// No description provided for @cash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get cash;
+
+  /// No description provided for @mobileMoney.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Money'**
+  String get mobileMoney;
+
+  /// No description provided for @bankTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Transfer'**
+  String get bankTransfer;
+
+  /// No description provided for @other.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other;
+
+  /// No description provided for @noteOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get noteOptional;
+
+  /// No description provided for @confirmPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'CONFIRM PAYMENT'**
+  String get confirmPayment;
+
+  /// No description provided for @mustBeGreaterThanZero.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be > 0'**
+  String get mustBeGreaterThanZero;
+
+  /// No description provided for @alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'ALERTS'**
+  String get alerts;
+
+  /// No description provided for @markAllAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get markAllAsRead;
+
+  /// No description provided for @clearReadNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear read notifications'**
+  String get clearReadNotifications;
+
+  /// No description provided for @allNotificationsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'All notifications marked as read'**
+  String get allNotificationsRead;
+
+  /// No description provided for @readNotificationsCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Read notifications cleared'**
+  String get readNotificationsCleared;
+
+  /// No description provided for @allClear.
+  ///
+  /// In en, this message translates to:
+  /// **'All clear'**
+  String get allClear;
+
+  /// No description provided for @noAlertsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no alerts or notifications at this time.'**
+  String get noAlertsDescription;
+
+  /// No description provided for @alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert'**
+  String get alert;
+
+  /// No description provided for @saasPlafform.
+  ///
+  /// In en, this message translates to:
+  /// **'SaaS PLATFORM'**
+  String get saasPlafform;
+
+  /// No description provided for @due.
+  ///
+  /// In en, this message translates to:
+  /// **'DUE {date}'**
+  String due(String date);
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'ACCOUNT'**
+  String get account;
+
+  /// No description provided for @shopDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'SHOP DETAILS'**
+  String get shopDetails;
+
+  /// No description provided for @editShopDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Shop Details'**
+  String get editShopDetails;
+
+  /// No description provided for @preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'PREFERENCES'**
+  String get preferences;
+
+  /// No description provided for @dangerZone.
+  ///
+  /// In en, this message translates to:
+  /// **'DANGER ZONE'**
+  String get dangerZone;
+
+  /// No description provided for @signOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get signOut;
+
+  /// No description provided for @editShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Shop'**
+  String get editShop;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @updateProfileFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile: {error}'**
+  String updateProfileFailed(String error);
 }
 
 class _AppLocalizationsDelegate
